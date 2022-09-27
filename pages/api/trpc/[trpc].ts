@@ -81,6 +81,7 @@ export const appRouter = t.router({
 
   //   })
   // )
+  // .query()
 });
 
 // export type definition of API

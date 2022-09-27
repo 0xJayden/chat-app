@@ -75,6 +75,12 @@ export const appRouter = t.router({
         messages,
       };
     }),
+  // getUsers: t.procedure
+  // .input(
+  //   z.object({
+
+  //   })
+  // )
 });
 
 // export type definition of API

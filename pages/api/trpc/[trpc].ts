@@ -21,6 +21,8 @@ export const appRouter = t.router({
           },
         },
       });
+
+      return { success: true, conversation };
     }),
   getConversation: t.procedure
     .input(

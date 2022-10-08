@@ -18,6 +18,7 @@ export default function Chat() {
   const [openConversation, setOpenConversation] = useState(false);
   const [openMenu, setOpenMenu] = useState(false);
   const [openUsers, setOpenUsers] = useState(false);
+  const [convoId, setConversationId] = useState<number>(0);
   const [toUser, setToUser] = useState<
     | (User & {
         conversations: (Conversation & {
@@ -60,12 +61,17 @@ export default function Chat() {
         openUsers={openUsers}
       />
       {/* <h1>welcome {session?.user?.email}</h1> */}
-      <Conversations fromEmail={fromEmail} openMenu={openMenu} />
+      <Conversations
+        fromEmail={fromEmail}
+        openMenu={openMenu}
+        setConversationId={setConversationId}
+      />
       <ConversationWindow
         openConversation={openConversation}
         session={session}
         toUser={toUser}
         fromUser={fromUser}
+        convoId={convoId}
       />
       <Users
         session={session}
@@ -74,6 +80,7 @@ export default function Chat() {
         setFromUser={setFromUser}
         setToUser={setToUser}
         openUsers={openUsers}
+        setConversationId={setConversationId}
       />
       {/* <button
           onClick={async () => {

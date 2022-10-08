@@ -1,14 +1,17 @@
 import { useSession } from "next-auth/react";
+import { Dispatch, SetStateAction } from "react";
 import { trpc } from "../utils/trpc";
 
 interface ConversationsInterface {
   fromEmail: string;
   openMenu: boolean;
+  setConversationId: Dispatch<SetStateAction<number>>;
 }
 
 export default function Conversations({
   fromEmail,
   openMenu,
+  setConversationId,
 }: ConversationsInterface) {
   const { data: session } = useSession();
 
@@ -24,7 +27,11 @@ export default function Conversations({
       <h1 className="p-5">Conversations</h1>
       <div className="flex flex-col w-full">
         {conversations?.conversations.map((c) => (
-          <div className="cursor-pointer p-2 border-b" key={c.id}>
+          <div
+            className="cursor-pointer p-2 border-b"
+            key={c.id}
+            onClick={() => setConversationId(c.id)}
+          >
             {c.id}
           </div>
         ))}

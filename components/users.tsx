@@ -41,6 +41,7 @@ interface UsersInterface {
     >
   >;
   openUsers: boolean;
+  setConversationId: Dispatch<SetStateAction<number>>;
 }
 
 export default function Users({
@@ -50,6 +51,7 @@ export default function Users({
   setFromUser,
   setToUser,
   openUsers,
+  setConversationId,
 }: UsersInterface) {
   const mutation = trpc.createConversation.useMutation();
 
@@ -77,11 +79,17 @@ export default function Users({
 
     if (
       user.conversations.length === 0 ||
-      user.conversations.find((c) => !c.users.includes(fromUser))
+      user.conversations.find((c) => c.users[0].id !== toUserId)
     ) {
-      console.log("working");
-      mutation.mutate({ toUserId, fromUserId });
-      setOpenConversation(true);
+      mutation.mutate(
+        { toUserId, fromUserId },
+        {
+          onSuccess(data) {
+            setConversationId(data.conversation.id);
+            setOpenConversation(true);
+          },
+        }
+      );
     }
 
     setOpenConversation(true);

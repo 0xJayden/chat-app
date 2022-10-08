@@ -24,6 +24,7 @@ interface ConversationWindowInterface {
         sessions: Session[];
       })
     | undefined;
+  convoId: number;
 }
 
 export default function ConversationWindow({
@@ -31,13 +32,30 @@ export default function ConversationWindow({
   session,
   toUser,
   fromUser,
+  convoId,
 }: ConversationWindowInterface) {
   const [message, setMessage] = useState<string | null>(null);
-  const [convoId, setConversationId] = useState<number>(0);
+  const [currentConversation, setCurrentConversation] = useState<
+    | (Conversation & {
+        messages: Message[];
+        users: User[];
+      })
+    | null
+  >(null);
 
-  const { data: conversation, refetch } = trpc.getConversation.useQuery({
-    convoId,
-  });
+  const query = trpc.getConversation.useQuery(
+    {
+      convoId,
+    },
+    {
+      onError(err) {
+        console.log("no conversation selected.");
+      },
+      onSuccess(data) {
+        setCurrentConversation(data.conversation);
+      },
+    }
+  );
 
   const mutation = trpc.sendMessage.useMutation();
 
@@ -48,36 +66,36 @@ export default function ConversationWindow({
     if (!fromEmail || !convoId) return;
     mutation.mutate({ message, fromEmail, convoId });
     setMessage(null);
-    setTimeout(() => refetch(), 400);
+    setTimeout(() => query.refetch(), 600);
   };
 
-  useEffect(() => {
-    if (!toUser) return;
-    const convo = fromUser?.conversations.find((c) =>
-      c.users.find((u) => u.id === toUser.id)
-    );
-    const id = convo?.id;
-    console.log("working1", convo, fromUser?.conversations);
-    if (!id) return;
-    setConversationId(id);
-  }, [openConversation]);
+  // useEffect(() => {
+  //   if (!toUser) return;
+  //   const convo = fromUser?.conversations.find((c) =>
+  //     c.users.find((u) => u.id === toUser.id)
+  //   );
+  //   const id = convo?.id;
+  //   console.log("working1", convo, fromUser?.conversations);
+  //   if (!id) return;
+  //   setConversationId(id);
+  // }, [openConversation]);
 
   return (
     <div className="flex flex-col w-full h-full pt-10 px-5 items-center justify-between relative">
       <h1>Conversation</h1>
-      {openConversation && (
+      {query.isSuccess && (
         <div className="flex flex-col w-full space-y-2 mb-20">
-          {conversation?.conversation?.messages.map((m) => (
+          {currentConversation?.messages.map((m) => (
             <div
               key={m.id}
               className={`w-full flex ${
-                m.from !== toUser?.email ? "justify-start" : "justify-end"
+                m.from === toUser?.email ? "justify-start" : "justify-end"
               }`}
             >
               <div
                 key={m.id}
                 className={`rounded px-5 py-2 w-fit ${
-                  m.from !== toUser?.email ? "bg-white" : "bg-red-500"
+                  m.from === toUser?.email ? "bg-white" : "bg-red-500"
                 }`}
               >
                 {m.message}

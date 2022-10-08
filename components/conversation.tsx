@@ -89,13 +89,13 @@ export default function ConversationWindow({
             <div
               key={m.id}
               className={`w-full flex ${
-                m.from === toUser?.email ? "justify-start" : "justify-end"
+                m.from !== fromUser?.email ? "justify-start" : "justify-end"
               }`}
             >
               <div
                 key={m.id}
                 className={`rounded px-5 py-2 w-fit ${
-                  m.from === toUser?.email ? "bg-white" : "bg-red-500"
+                  m.from !== fromUser?.email ? "bg-white" : "bg-red-500"
                 }`}
               >
                 {m.message}

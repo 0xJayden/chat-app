@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { trpc } from "../utils/trpc";
 import { User, Conversation, Session, Message } from "@prisma/client";
 
-interface ConversationWindow {
+interface ConversationWindowInterface {
   openConversation: boolean;
   session: NextSession | null;
   toUser:
@@ -31,7 +31,7 @@ export default function ConversationWindow({
   session,
   toUser,
   fromUser,
-}: ConversationWindow) {
+}: ConversationWindowInterface) {
   const [message, setMessage] = useState<string | null>(null);
   const [convoId, setConversationId] = useState<number>(0);
 

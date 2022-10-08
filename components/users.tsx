@@ -2,7 +2,7 @@ import { NextSession } from "../utils/utils";
 import { Dispatch, SetStateAction } from "react";
 import { trpc } from "../utils/trpc";
 import { Conversation, User, Session, Message } from "@prisma/client";
-interface Users {
+interface UsersInterface {
   session: NextSession | null;
   setOpenConversation: Dispatch<SetStateAction<boolean>>;
   users:
@@ -50,7 +50,7 @@ export default function Users({
   setFromUser,
   setToUser,
   openUsers,
-}: Users) {
+}: UsersInterface) {
   const mutation = trpc.createConversation.useMutation();
 
   const startConversation = (

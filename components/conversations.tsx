@@ -1,12 +1,15 @@
 import { useSession } from "next-auth/react";
 import { trpc } from "../utils/trpc";
 
-interface Conversations {
+interface ConversationsInterface {
   fromEmail: string;
   openMenu: boolean;
 }
 
-export default function Conversations({ fromEmail, openMenu }: Conversations) {
+export default function Conversations({
+  fromEmail,
+  openMenu,
+}: ConversationsInterface) {
   const { data: session } = useSession();
 
   const { data: conversations } = trpc.getConversations.useQuery({ fromEmail });

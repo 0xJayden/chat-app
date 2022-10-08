@@ -1,7 +1,7 @@
 import { Bars3Icon, UserGroupIcon } from "@heroicons/react/24/outline";
 import { Dispatch, SetStateAction } from "react";
 
-interface Navbar {
+interface NavbarInterface {
   setOpenMenu: Dispatch<SetStateAction<boolean>>;
   openMenu: boolean;
   setOpenUsers: Dispatch<SetStateAction<boolean>>;
@@ -13,7 +13,7 @@ export default function Navbar({
   openMenu,
   setOpenUsers,
   openUsers,
-}: Navbar) {
+}: NavbarInterface) {
   return (
     <div className="flex z-10 justify-between items-center px-2 w-full h-10 absolute top-0 border-b">
       <Bars3Icon

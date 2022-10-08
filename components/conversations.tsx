@@ -1,17 +1,44 @@
-import { useSession } from "next-auth/react";
 import { Dispatch, SetStateAction } from "react";
+import { Conversation, Message, Session, User } from "@prisma/client";
+import { useSession } from "next-auth/react";
 import { trpc } from "../utils/trpc";
 
 interface ConversationsInterface {
   fromEmail: string;
   openMenu: boolean;
   setConversationId: Dispatch<SetStateAction<number>>;
+  setFromUser: Dispatch<
+    SetStateAction<
+      | (User & {
+          conversations: (Conversation & {
+            messages: Message[];
+            users: User[];
+          })[];
+          sessions: Session[];
+        })
+      | undefined
+    >
+  >;
+  setToUser: Dispatch<
+    SetStateAction<
+      | (User & {
+          conversations: (Conversation & {
+            messages: Message[];
+            users: User[];
+          })[];
+          sessions: Session[];
+        })
+      | undefined
+    >
+  >;
 }
 
 export default function Conversations({
   fromEmail,
   openMenu,
   setConversationId,
+  setFromUser,
+  setToUser,
 }: ConversationsInterface) {
   const { data: session } = useSession();
 
@@ -30,7 +57,11 @@ export default function Conversations({
           <div
             className="cursor-pointer p-2 border-b"
             key={c.id}
-            onClick={() => setConversationId(c.id)}
+            onClick={() => {
+              setConversationId(c.id);
+              setFromUser(c.users[1]);
+              setToUser(c.users[0]);
+            }}
           >
             {c.id}
           </div>

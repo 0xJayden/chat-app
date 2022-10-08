@@ -69,38 +69,29 @@ export default function ConversationWindow({
     setTimeout(() => query.refetch(), 600);
   };
 
-  // useEffect(() => {
-  //   if (!toUser) return;
-  //   const convo = fromUser?.conversations.find((c) =>
-  //     c.users.find((u) => u.id === toUser.id)
-  //   );
-  //   const id = convo?.id;
-  //   console.log("working1", convo, fromUser?.conversations);
-  //   if (!id) return;
-  //   setConversationId(id);
-  // }, [openConversation]);
-
   return (
     <div className="flex flex-col w-full h-full pt-10 px-5 items-center justify-between relative">
       <h1>Conversation</h1>
       {query.isSuccess && (
         <div className="flex flex-col w-full space-y-2 mb-20">
           {currentConversation?.messages.map((m) => (
-            <div
-              key={m.id}
-              className={`w-full flex ${
-                m.from !== fromUser?.email ? "justify-start" : "justify-end"
-              }`}
-            >
+            <>
               <div
                 key={m.id}
-                className={`rounded px-5 py-2 w-fit ${
-                  m.from !== fromUser?.email ? "bg-white" : "bg-red-500"
+                className={`w-full flex ${
+                  m.from !== fromUser?.email ? "justify-start" : "justify-end"
                 }`}
               >
-                {m.message}
+                <div
+                  key={m.id}
+                  className={`rounded px-5 py-2 w-fit ${
+                    m.from !== fromUser?.email ? "bg-white" : "bg-red-500"
+                  }`}
+                >
+                  {m.message}
+                </div>
               </div>
-            </div>
+            </>
           ))}
         </div>
       )}

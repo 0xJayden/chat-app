@@ -65,6 +65,8 @@ export default function Chat() {
         fromEmail={fromEmail}
         openMenu={openMenu}
         setConversationId={setConversationId}
+        setFromUser={setFromUser}
+        setToUser={setToUser}
       />
       <ConversationWindow
         openConversation={openConversation}

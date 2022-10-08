@@ -98,6 +98,17 @@ export const appRouter = t.router({
           conversations: {
             include: {
               messages: true,
+              users: {
+                include: {
+                  conversations: {
+                    include: {
+                      messages: true,
+                      users: true,
+                    },
+                  },
+                  sessions: true,
+                },
+              },
             },
           },
         },

@@ -54,6 +54,7 @@ export default function ConversationWindow({
       onSuccess(data) {
         setCurrentConversation(data.conversation);
       },
+      refetchInterval: 600,
     }
   );
 
@@ -66,7 +67,7 @@ export default function ConversationWindow({
     if (!fromEmail || !convoId) return;
     mutation.mutate({ message, fromEmail, convoId });
     setMessage(null);
-    setTimeout(() => query.refetch(), 600);
+    // setTimeout(() => query.refetch(), 600);
   };
 
   return (

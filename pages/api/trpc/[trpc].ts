@@ -6,82 +6,125 @@ import { prisma } from "../../../utils/prisma";
 export const t = initTRPC.create();
 
 export const appRouter = t.router({
-  hello: t.procedure
+  createConversation: t.procedure
     .input(
-      z
-        .object({
-          text: z.string().nullish(),
-        })
-        .nullish()
+      z.object({
+        toUserId: z.string(),
+        fromUserId: z.string(),
+      })
     )
-    .query(({ input }) => {
+    .mutation(async ({ input }) => {
+      const conversation = await prisma.conversation.create({
+        data: {
+          users: {
+            connect: [{ id: input.toUserId }, { id: input.fromUserId }],
+          },
+        },
+      });
+    }),
+  getConversation: t.procedure
+    .input(
+      z.object({
+        convoId: z.number(),
+      })
+    )
+    .query(async ({ input }) => {
+      const conversation = await prisma.conversation.findFirst({
+        where: {
+          id: input.convoId,
+        },
+        include: {
+          messages: true,
+          users: true,
+        },
+      });
+
       return {
-        greeting: `hello ${input?.text ?? "world"}`,
+        conversation,
       };
     }),
   sendMessage: t.procedure
     .input(
       z.object({
         fromEmail: z.string(),
-        toEmail: z.string(),
         message: z.string(),
+        convoId: z.number(),
       })
     )
     .mutation(async ({ input }) => {
-      const user = await prisma.user.findFirst({
-        where: {
-          email: input.fromEmail,
-        },
-      });
+      // const user = await prisma.user.findFirst({
+      //   where: {
+      //     email: input.fromEmail,
+      //   },
+      //   include: {
+      //     conversations: true,
+      //   },
+      // });
 
-      const toUser = await prisma.user.findFirst({
-        where: {
-          email: input.toEmail,
-        },
-      });
+      // const id = user?.conversations[0].id;
 
-      if (!user || !toUser?.email) return;
+      // const toUser = await prisma.user.findFirst({
+      //   where: {
+      //     email: input.toEmail,
+      //   },
+      // });
+
+      // if (!user || !toUser?.email) return;
 
       const message = await prisma.message.create({
         data: {
           from: input.fromEmail,
-          to: input.toEmail,
           message: input.message,
-          user: { connect: { id: user.id } },
+          conversation: { connect: { id: input.convoId } },
         },
       });
 
       return { success: true, message };
     }),
-  getMessages: t.procedure
+  getConversations: t.procedure
     .input(
       z.object({
         fromEmail: z.string(),
       })
     )
     .query(async ({ input }) => {
-      const user = await prisma.user.findMany({
+      const user = await prisma.user.findFirst({
         where: {
           email: input.fromEmail,
         },
         include: {
-          messages: true,
+          conversations: {
+            include: {
+              messages: true,
+            },
+          },
         },
       });
 
-      const messages = user[0].messages;
+      if (!user) return;
+
+      const conversations = user.conversations;
 
       return {
-        messages,
+        conversations,
       };
     }),
-  // getUsers: t.procedure
-  // .input(
-  //   z.object({
-
-  //   })
-  // )
-  // .query()
+  getUsers: t.procedure.query(async () => {
+    const users = await prisma.user.findMany({
+      include: {
+        sessions: true,
+        conversations: {
+          include: {
+            messages: true,
+            users: true,
+          },
+        },
+      },
+    });
+    return {
+      users,
+    };
+  }),
 });
 
 // export type definition of API

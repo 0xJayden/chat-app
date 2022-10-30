@@ -48,22 +48,14 @@ export default function ConversationWindow({
     | null
   >(null);
 
-  const query = trpc.getConversation.useQuery(
-    {
-      convoId,
+  const query = trpc.useQuery(["get-conversation", { convoId }], {
+    onSuccess(data) {
+      setCurrentConversation(data.conversation);
     },
-    {
-      onError(err: any) {
-        console.log("no conversation selected.", err);
-      },
-      onSuccess(data: any) {
-        setCurrentConversation(data.conversation);
-      },
-      refetchInterval: 600,
-    }
-  );
+    refetchInterval: 600,
+  });
 
-  const mutation = trpc.sendMessage.useMutation();
+  const mutation = trpc.useMutation(["send-message"]);
 
   const sendMessage = async () => {
     if (!message || !session?.user) return;
@@ -96,7 +88,7 @@ export default function ConversationWindow({
                 }`}
               >
                 <div
-                  key={m.id}
+                  key={m.conversationId}
                   className={`rounded px-5 py-2 w-fit max-w-[275px] ${
                     m.from !== fromEmail ? "bg-white" : "bg-red-500"
                   }`}

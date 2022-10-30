@@ -44,7 +44,18 @@ export default function Conversations({
 }: ConversationsInterface) {
   const { data: session } = useSession();
 
-  const { data: conversations } = trpc.getConversations.useQuery({ fromEmail });
+  const { data: conversations, isSuccess } = trpc.useQuery(
+    ["get-conversations", { fromEmail }],
+    {
+      onError(err) {
+        console.log(err, "err");
+      },
+      refetchInterval: false,
+      refetchOnReconnect: false,
+      refetchOnWindowFocus: false,
+    }
+  );
+
   return (
     <div
       className={`flex flex-col fixed left-0 top-10 z-10 items-center border-r h-full bg-gray-500 ${
@@ -54,27 +65,29 @@ export default function Conversations({
       }`}
     >
       <h1 className="p-5">Conversations</h1>
-      <div className="flex flex-col w-full">
-        {conversations?.conversations.map((c: any) => (
-          <div
-            className="cursor-pointer p-2 border-b"
-            key={c.id}
-            onClick={() => {
-              setConversationId(c.id);
-              if (c.users[0].email === fromEmail) {
-                setFromUser(c.users[0]);
-                setToUser(c.users[1]);
-              } else {
-                setFromUser(c.users[1]);
-                setToUser(c.users[0]);
-              }
-              setOpenMenu(false);
-            }}
-          >
-            {c.users.find((u: any) => u.email !== fromEmail)?.email}
-          </div>
-        ))}
-      </div>
+      {isSuccess && (
+        <div className="flex flex-col w-full">
+          {conversations?.conversations.map((c) => (
+            <div
+              className="cursor-pointer p-2 border-b"
+              key={c.id}
+              onClick={() => {
+                setConversationId(c.id);
+                if (c.users[0].email === fromEmail) {
+                  setFromUser(c.users[0]);
+                  setToUser(c.users[1]);
+                } else {
+                  setFromUser(c.users[1]);
+                  setToUser(c.users[0]);
+                }
+                setOpenMenu(false);
+              }}
+            >
+              {c.users.find((u) => u.email !== fromEmail)?.email}
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

@@ -39,7 +39,7 @@ export default function Chat() {
   >();
 
   const { data: session } = useSession();
-  const { data: users } = trpc.getUsers.useQuery();
+  const { data: users } = trpc.useQuery(["get-users"]);
 
   useEffect(() => {
     if (session && session.user?.email) {

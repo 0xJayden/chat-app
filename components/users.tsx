@@ -55,7 +55,7 @@ export default function Users({
   setOpenUsers,
   setConversationId,
 }: UsersInterface) {
-  const mutation = trpc.createConversation.useMutation();
+  const mutation = trpc.useMutation(["create-conversation"]);
 
   const startConversation = (
     user:

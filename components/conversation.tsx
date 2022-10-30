@@ -56,7 +56,7 @@ export default function ConversationWindow({
     },
     {
       onError(err) {
-        console.log("no conversation selected.");
+        console.log("no conversation selected.", err);
       },
       onSuccess(data) {
         setCurrentConversation(data.conversation);

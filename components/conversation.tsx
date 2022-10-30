@@ -61,7 +61,7 @@ export default function ConversationWindow({
       onSuccess(data) {
         setCurrentConversation(data.conversation);
       },
-      // refetchInterval: 600,
+      refetchInterval: 600,
     }
   );
 

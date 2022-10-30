@@ -56,7 +56,7 @@ export default function ConversationWindow({
       onError(err: any) {
         console.log("no conversation selected.", err);
       },
-      onSuccess(data) {
+      onSuccess(data: any) {
         setCurrentConversation(data.conversation);
       },
       refetchInterval: 600,

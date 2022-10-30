@@ -70,7 +70,6 @@ export default function Chat() {
         setOpenMenu={setOpenMenu}
       />
       <ConversationWindow
-        openConversation={openConversation}
         session={session}
         toUser={toUser}
         fromUser={fromUser}

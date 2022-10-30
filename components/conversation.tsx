@@ -1,11 +1,10 @@
 import { NextSession } from "../utils/utils";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import { trpc } from "../utils/trpc";
 import { User, Conversation, Session, Message } from "@prisma/client";
 import { ArrowUpIcon } from "@heroicons/react/24/outline";
 
 interface ConversationWindowInterface {
-  openConversation: boolean;
   session: NextSession | null;
   toUser:
     | (User & {
@@ -32,7 +31,6 @@ interface ConversationWindowInterface {
 }
 
 export default function ConversationWindow({
-  openConversation,
   session,
   toUser,
   fromUser,
@@ -55,7 +53,7 @@ export default function ConversationWindow({
       convoId,
     },
     {
-      onError(err) {
+      onError(err: any) {
         console.log("no conversation selected.", err);
       },
       onSuccess(data) {

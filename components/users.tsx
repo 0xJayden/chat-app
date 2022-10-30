@@ -41,6 +41,7 @@ interface UsersInterface {
     >
   >;
   openUsers: boolean;
+  setOpenUsers: Dispatch<SetStateAction<boolean>>;
   setConversationId: Dispatch<SetStateAction<number>>;
 }
 
@@ -51,6 +52,7 @@ export default function Users({
   setFromUser,
   setToUser,
   openUsers,
+  setOpenUsers,
   setConversationId,
 }: UsersInterface) {
   const mutation = trpc.createConversation.useMutation();
@@ -77,22 +79,29 @@ export default function Users({
 
     const fromUserId = fromUser.id;
 
+    console.log("to", user);
+    console.log("from", fromUser);
+
     if (
-      user.conversations.length === 0 ||
-      user.conversations.find((c) => c.users[0].id !== toUserId)
+      fromUser.conversations.find((c) =>
+        c.users.find((u) => u.email === user.email)
+      )
     ) {
-      mutation.mutate(
-        { toUserId, fromUserId },
-        {
-          onSuccess(data) {
-            setConversationId(data.conversation.id);
-            setOpenConversation(true);
-          },
-        }
-      );
+      setOpenUsers(false);
+      return;
     }
 
+    mutation.mutate(
+      { toUserId, fromUserId },
+      {
+        onSuccess(data) {
+          setConversationId(data.conversation.id);
+          setOpenConversation(true);
+        },
+      }
+    );
     setOpenConversation(true);
+    setOpenUsers(false);
   };
 
   return (
@@ -106,7 +115,7 @@ export default function Users({
       <h1>Users</h1>
       {users?.users.map((u) => (
         <div
-          className="cursor-pointer"
+          className="cursor-pointer border-b w-full p-2"
           key={u.email}
           onClick={() => {
             if (!u) return;

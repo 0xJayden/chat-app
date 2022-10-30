@@ -3,7 +3,6 @@ import Users from "../components/users";
 import Conversations from "../components/conversations";
 import ConversationWindow from "../components/conversation";
 import { useSession } from "next-auth/react";
-import { signOut } from "next-auth/react";
 import { useState, useEffect } from "react";
 import { trpc } from "../utils/trpc";
 import { User, Conversation, Session, Message } from "@prisma/client";
@@ -13,7 +12,6 @@ import Navbar from "../components/navbar";
 export default function Chat() {
   const router = useRouter();
 
-  const [toEmail, setToEmail] = useState<string>("");
   const [fromEmail, setFromEmail] = useState<string>("");
   const [openConversation, setOpenConversation] = useState(false);
   const [openMenu, setOpenMenu] = useState(false);
@@ -60,13 +58,16 @@ export default function Chat() {
         setOpenUsers={setOpenUsers}
         openUsers={openUsers}
       />
-      {/* <h1>welcome {session?.user?.email}</h1> */}
+      <div className="w-full flex justify-center items-end h-20">
+        <h1 className="text-white">welcome {session?.user?.email}</h1>
+      </div>
       <Conversations
         fromEmail={fromEmail}
         openMenu={openMenu}
         setConversationId={setConversationId}
         setFromUser={setFromUser}
         setToUser={setToUser}
+        setOpenMenu={setOpenMenu}
       />
       <ConversationWindow
         openConversation={openConversation}
@@ -74,6 +75,9 @@ export default function Chat() {
         toUser={toUser}
         fromUser={fromUser}
         convoId={convoId}
+        fromEmail={fromEmail}
+        setOpenMenu={setOpenMenu}
+        setOpenUsers={setOpenUsers}
       />
       <Users
         session={session}
@@ -82,15 +86,9 @@ export default function Chat() {
         setFromUser={setFromUser}
         setToUser={setToUser}
         openUsers={openUsers}
+        setOpenUsers={setOpenUsers}
         setConversationId={setConversationId}
       />
-      {/* <button
-          onClick={async () => {
-            await signOut();
-          }}
-        >
-          Sign out
-        </button> */}
     </Layout>
   );
 }

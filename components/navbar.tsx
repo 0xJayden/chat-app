@@ -1,5 +1,6 @@
 import { Bars3Icon, UserGroupIcon } from "@heroicons/react/24/outline";
 import { Dispatch, SetStateAction } from "react";
+import { signOut } from "next-auth/react";
 
 interface NavbarInterface {
   setOpenMenu: Dispatch<SetStateAction<boolean>>;
@@ -15,12 +16,29 @@ export default function Navbar({
   openUsers,
 }: NavbarInterface) {
   return (
-    <div className="flex z-10 justify-between items-center px-2 w-full h-10 absolute top-0 border-b">
+    <div className="fixed z-10 justify-between items-center px-2 w-full h-10 flex bg-gray-700 top-0 border-b">
       <Bars3Icon
-        onClick={() => setOpenMenu(!openMenu)}
+        onClick={() => {
+          setOpenMenu(!openMenu);
+          setOpenUsers(false);
+        }}
         className="h-7 cursor-pointer"
       />
-      <UserGroupIcon onClick={() => setOpenUsers(!openUsers)} className="h-7" />
+      <button
+        className="border px-2 rounded-full bg-white"
+        onClick={async () => {
+          await signOut();
+        }}
+      >
+        Sign out
+      </button>
+      <UserGroupIcon
+        onClick={() => {
+          setOpenUsers(!openUsers);
+          setOpenMenu(false);
+        }}
+        className="h-7"
+      />
     </div>
   );
 }

@@ -31,6 +31,7 @@ interface ConversationsInterface {
       | undefined
     >
   >;
+  setOpenMenu: Dispatch<SetStateAction<boolean>>;
 }
 
 export default function Conversations({
@@ -39,6 +40,7 @@ export default function Conversations({
   setConversationId,
   setFromUser,
   setToUser,
+  setOpenMenu,
 }: ConversationsInterface) {
   const { data: session } = useSession();
 
@@ -59,11 +61,17 @@ export default function Conversations({
             key={c.id}
             onClick={() => {
               setConversationId(c.id);
-              setFromUser(c.users[1]);
-              setToUser(c.users[0]);
+              if (c.users[0].email === fromEmail) {
+                setFromUser(c.users[0]);
+                setToUser(c.users[1]);
+              } else {
+                setFromUser(c.users[1]);
+                setToUser(c.users[0]);
+              }
+              setOpenMenu(false);
             }}
           >
-            {c.id}
+            {c.users.find((u) => u.email !== fromEmail)?.email}
           </div>
         ))}
       </div>

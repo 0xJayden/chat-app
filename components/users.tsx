@@ -94,7 +94,7 @@ export default function Users({
     mutation.mutate(
       { toUserId, fromUserId },
       {
-        onSuccess(data) {
+        onSuccess(data: { success: boolean; conversation: Conversation }) {
           setConversationId(data.conversation.id);
           setOpenConversation(true);
         },

@@ -55,7 +55,7 @@ export default function Conversations({
     >
       <h1 className="p-5">Conversations</h1>
       <div className="flex flex-col w-full">
-        {conversations?.conversations.map((c) => (
+        {conversations?.conversations.map((c: any) => (
           <div
             className="cursor-pointer p-2 border-b"
             key={c.id}
@@ -71,7 +71,7 @@ export default function Conversations({
               setOpenMenu(false);
             }}
           >
-            {c.users.find((u) => u.email !== fromEmail)?.email}
+            {c.users.find((u: any) => u.email !== fromEmail)?.email}
           </div>
         ))}
       </div>

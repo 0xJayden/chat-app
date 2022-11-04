@@ -89,11 +89,11 @@ export default function ConversationWindow({
               >
                 <div
                   key={m.conversationId}
-                  className={`rounded px-5 py-2 w-fit max-w-[275px] ${
+                  className={`rounded px-5 py-2 max-w-[275px] ${
                     m.from !== fromEmail ? "bg-white" : "bg-red-500"
                   }`}
                 >
-                  {m.message}
+                  <p className="overflow-auto">{m.message}</p>
                 </div>
               </div>
             </>

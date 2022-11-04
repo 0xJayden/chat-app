@@ -44,7 +44,7 @@ model Message {
   id             Int          @id @default(autoincrement())
   time           DateTime     @default(now())
   from           String
-  message        String
+  message        String       @db.Text
   conversation   Conversation @relation(fields: [conversationId], references: [id])
   conversationId Int
 }

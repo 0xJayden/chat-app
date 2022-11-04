@@ -115,6 +115,22 @@ export const appRouter = trpc
         users,
       };
     },
+  })
+  .mutation("remove-user", {
+    input: z.object({
+      user: z.string(),
+      convoId: z.number(),
+    }),
+    async resolve({ input }) {
+      const user = await prisma.user.update({
+        where: { email: input.user },
+        data: {
+          conversations: {
+            disconnect: { id: input.convoId },
+          },
+        },
+      });
+    },
   });
 
 // ({

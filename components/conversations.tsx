@@ -79,17 +79,20 @@ export default function Conversations({
           : "opacity-0 -translate-x-full transition duration-500 ease-out"
       }`}
     >
-      <h1 className="p-5">Conversations</h1>
+      <h1 className="p-2">
+        {conversations?.conversations.length} Conversations
+      </h1>
       {isSuccess && (
         <div className="flex flex-col w-full overflow-scroll">
           {conversations?.conversations.map((c) => (
-            <div className="cursor-pointer p-2 border-b" key={c.id}>
+            <div className="p-2 border-b" key={c.id}>
               <XMarkIcon
                 onClick={() => removeSelfFromConvo(c.id)}
                 height="11px"
                 className="cursor-pointer rounded-full hover:bg-white"
               />
-              <p
+              <div
+                className="cursor-pointer"
                 onClick={() => {
                   setConversationId(c.id);
                   if (c.users[0].email === fromEmail) {
@@ -102,13 +105,15 @@ export default function Conversations({
                   setOpenMenu(false);
                 }}
               >
-                {c.users.find((u) => u.email !== fromEmail)
-                  ? c.users.find((u) => u.email !== fromEmail)?.email
-                  : `No Users Left`}
-              </p>
-              <p className="text-gray-400 line-clamp-2 text-ellipsis text-sm">
-                {c.messages[c.messages.length - 1]?.message}
-              </p>
+                <p>
+                  {c.users.find((u) => u.email !== fromEmail)
+                    ? c.users.find((u) => u.email !== fromEmail)?.email
+                    : `No Users Left`}
+                </p>
+                <p className="text-gray-400 line-clamp-2 text-ellipsis text-sm">
+                  {c.messages[c.messages.length - 1]?.message}
+                </p>
+              </div>
             </div>
           ))}
         </div>

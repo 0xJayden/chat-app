@@ -1,5 +1,5 @@
 import { NextSession } from "../utils/utils";
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import { trpc } from "../utils/trpc";
 import { User, Conversation, Session, Message } from "@prisma/client";
 import { ArrowUpIcon } from "@heroicons/react/24/outline";
@@ -48,6 +48,12 @@ export default function ConversationWindow({
     | null
   >(null);
 
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
   const query = trpc.useQuery(["get-conversation", { convoId }], {
     onSuccess(data) {
       setCurrentConversation(data.conversation);
@@ -65,6 +71,8 @@ export default function ConversationWindow({
     setMessage(null);
     // setTimeout(() => query.refetch(), 600);
   };
+
+  useEffect(scrollToBottom, [currentConversation]);
 
   return (
     <div
@@ -98,6 +106,7 @@ export default function ConversationWindow({
               </div>
             </>
           ))}
+          <div ref={messagesEndRef} />
         </div>
       )}
 

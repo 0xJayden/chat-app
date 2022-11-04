@@ -117,15 +117,16 @@ export default function Users({
     >
       <h1>Users</h1>
       {users?.users.map((u) => (
-        <div
-          className="cursor-pointer border-b w-full p-2"
-          key={u.email}
-          onClick={() => {
-            if (!u) return;
-            startConversation(u);
-          }}
-        >
-          {u.email}
+        <div className="cursor-pointer border-b w-full" key={u.email}>
+          <p
+            className="p-2"
+            onClick={() => {
+              if (!u) return;
+              startConversation(u);
+            }}
+          >
+            {u.email}
+          </p>
         </div>
       ))}
     </div>

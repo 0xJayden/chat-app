@@ -16,7 +16,7 @@ export default function Navbar({
   openUsers,
 }: NavbarInterface) {
   return (
-    <div className="fixed z-10 justify-between items-center px-2 w-full h-10 flex bg-gray-700 top-0 border-b">
+    <div className="fixed z-10 justify-between items-center px-2 w-full h-10 flex bg-gray-700 top-0 border-b border-gray-500">
       <Bars3Icon
         onClick={() => {
           setOpenMenu(!openMenu);
@@ -25,7 +25,7 @@ export default function Navbar({
         className="h-7 cursor-pointer"
       />
       <button
-        className="border px-2 rounded-full bg-white"
+        className="border px-2 rounded-full hover:bg-red-500 transition-all duration-300 ease-out"
         onClick={async () => {
           await signOut();
         }}
@@ -37,7 +37,7 @@ export default function Navbar({
           setOpenUsers(!openUsers);
           setOpenMenu(false);
         }}
-        className="h-7"
+        className="h-7 cursor-pointer"
       />
     </div>
   );

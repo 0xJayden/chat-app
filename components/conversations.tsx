@@ -79,14 +79,14 @@ export default function Conversations({
     <>
       {openDeleteConvo && (
         <div className="fixed flex inset-0 justify-center items-center z-20 backdrop-brightness-75">
-          <div className="flex flex-col justify-between text-center border rounded h-[150px] w-[250px] p-2 bg-gray-700">
+          <div className="flex flex-col justify-between text-center border border-gray-500 rounded h-[150px] w-[250px] p-2 bg-gray-700">
             <p className="text-gray-300">
               Are you sure you want to remove the conversation?
             </p>
             <div className="flex justify-between px-4">
               <button
                 onClick={() => setOpenDeleteConvo(false)}
-                className="border rounded py-2 px-4"
+                className="border border-gray-500 rounded py-2 px-4"
               >
                 No
               </button>
@@ -95,7 +95,7 @@ export default function Conversations({
                   if (!convoId) return;
                   removeSelfFromConvo(convoId);
                 }}
-                className="border rounded py-2 px-4 bg-white"
+                className="border border-gray-500 rounded py-2 px-4 bg-gray-200 text-gray-700"
               >
                 Yes
               </button>
@@ -104,30 +104,30 @@ export default function Conversations({
         </div>
       )}
       <div
-        className={`flex flex-col fixed left-0 top-10 z-10 items-center border-r h-full bg-gray-700 max-w-[250px] ${
+        className={`flex flex-col fixed left-0 top-10 z-10 items-center border-r border-gray-500 h-full bg-gray-700 max-w-[250px] ${
           openMenu
             ? "opacity-100 transition duration-500 ease-out"
             : "opacity-0 -translate-x-full transition duration-500 ease-out"
         }`}
       >
-        <h1 className="p-2">
+        <h1 className="p-2 text-lg font-bold">
           {conversations?.conversations.length} Conversations
         </h1>
         {isLoading && !isSuccess && <div>Loading...</div>}
         {isSuccess && (
           <div className="flex flex-col w-full overflow-scroll">
             {conversations?.conversations.map((c) => (
-              <div className="p-2 border-b" key={c.id}>
+              <div className="border-b border-gray-500" key={c.id}>
                 <XMarkIcon
                   onClick={() => {
                     setConvoId(c.id);
                     setOpenDeleteConvo(true);
                   }}
                   height="15px"
-                  className="cursor-pointer rounded-full hover:bg-red-500"
+                  className="cursor-pointer rounded-full mx-2 mt-2 hover:bg-red-500"
                 />
                 <div
-                  className="cursor-pointer"
+                  className="cursor-pointer p-2 hover:bg-gray-500 transition-all duration-300 ease-out"
                   onClick={() => {
                     setConversationId(c.id);
                     if (c.users[0].email === fromEmail) {
@@ -146,7 +146,9 @@ export default function Conversations({
                       : `No Users Left`}
                   </p>
                   <p className="text-gray-400 line-clamp-2 text-ellipsis text-sm">
-                    {c.messages[c.messages.length - 1]?.message}
+                    {c.messages.length > 0
+                      ? c.messages[c.messages.length - 1]?.message
+                      : "No messages yet..."}
                   </p>
                 </div>
               </div>

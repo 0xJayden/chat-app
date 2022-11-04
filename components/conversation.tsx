@@ -100,7 +100,7 @@ export default function ConversationWindow({
               >
                 <div
                   className={`rounded px-5 py-2 max-w-[275px] ${
-                    m.from !== fromEmail ? "bg-white" : "bg-red-500"
+                    m.from !== fromEmail ? "bg-gray-500" : "bg-red-700"
                   }`}
                 >
                   <p className="overflow-auto">{m.message}</p>
@@ -126,8 +126,8 @@ export default function ConversationWindow({
           placeholder="Type here..."
           className="px-2 mr-2 min-h-[50px] max-h-[100px] w-full bg-gray-500 outline-none rounded"
         ></textarea>
-        <button className="px-3 rounded-full bg-white" type="submit">
-          <ArrowUpIcon height="20px" />
+        <button className="px-3 rounded-full bg-gray-200" type="submit">
+          <ArrowUpIcon className="text-gray-600" height="20px" />
         </button>
       </form>
       {mutation.error && <p>Something went wrong! {mutation.error.message}</p>}

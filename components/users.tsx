@@ -82,10 +82,13 @@ export default function Users({
     console.log("to", user);
     console.log("from", fromUser);
 
+    const existingUserInConvo = fromUser.conversations.find((c) =>
+      c.users.find((u) => u.email === user.email)
+    );
+
     if (
-      fromUser.conversations.find((c) =>
-        c.users.find((u) => u.email === user.email)
-      )
+      existingUserInConvo &&
+      existingUserInConvo.users.find((u) => u.email === fromUser.email)
     ) {
       setOpenUsers(false);
       return;

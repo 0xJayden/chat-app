@@ -102,7 +102,9 @@ export default function Conversations({
                   setOpenMenu(false);
                 }}
               >
-                {c.users.find((u) => u.email !== fromEmail)?.email}
+                {c.users.find((u) => u.email !== fromEmail)
+                  ? c.users.find((u) => u.email !== fromEmail)?.email
+                  : `No Users Left`}
               </p>
               <p className="text-gray-400 line-clamp-2 text-ellipsis text-sm">
                 {c.messages[c.messages.length - 1]?.message}

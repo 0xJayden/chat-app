@@ -110,7 +110,7 @@ export default function Conversations({
             : "opacity-0 -translate-x-full transition duration-500 ease-out"
         }`}
       >
-        <h1 className="p-2 text-lg font-bold">
+        <h1 className="p-2 text-lg font-normal">
           {conversations?.conversations.length} Conversations
         </h1>
         {isLoading && !isSuccess && <div>Loading...</div>}

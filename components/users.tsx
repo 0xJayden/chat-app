@@ -115,11 +115,11 @@ export default function Users({
           : "opacity-0 translate-x-full transition duration-500 ease-out"
       }`}
     >
-      <h1 className="text-lg font-bold">Account</h1>
+      <h1 className="text-lg font-normal">Account</h1>
       <p className="p-2 border-b border-gray-500 cursor-pointer hover:bg-gray-500 transition-all duration-300 ease-out">
         {session?.user?.email}
       </p>
-      <h1 className="pt-5 pb-3 text-lg font-bold">Users</h1>
+      <h1 className="pt-5 pb-3 text-lg font-normal">Users</h1>
       <>
         <h1 className="text-green-500">Online</h1>
         {users?.users.map(

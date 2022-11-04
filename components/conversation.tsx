@@ -1,5 +1,12 @@
 import { NextSession } from "../utils/utils";
-import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
+import {
+  BaseSyntheticEvent,
+  Dispatch,
+  SetStateAction,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { trpc } from "../utils/trpc";
 import { User, Conversation, Session, Message } from "@prisma/client";
 import { ArrowUpIcon } from "@heroicons/react/24/outline";
@@ -58,6 +65,7 @@ export default function ConversationWindow({
     onSuccess(data) {
       setCurrentConversation(data.conversation);
     },
+    refetchInterval: 1200,
     refetchOnWindowFocus: false,
   });
 
@@ -69,10 +77,14 @@ export default function ConversationWindow({
 
   const sendMessage = async () => {
     if (!message || !session?.user) return;
-    console.log("email", fromEmail, "user", fromUser, convoId);
+    // console.log("email", fromEmail, "user", fromUser, convoId);
     if (!fromEmail || !convoId) return;
     mutation.mutate({ message, fromEmail, convoId });
     setMessage(null);
+  };
+
+  const newLine = () => {
+    document.addEventListener("keydown", (e) => {});
   };
 
   useEffect(scrollToBottom, [currentConversation]);
@@ -114,18 +126,33 @@ export default function ConversationWindow({
 
       <form
         className="fixed w-full flex bottom-0 p-2 bg-gradient-to-r from-gray-800 to-gray-600"
-        onSubmit={async (e) => {
+        onSubmit={(e) => {
           e.preventDefault();
-          await sendMessage();
+          sendMessage();
         }}
       >
+        <textarea
+          onKeyDown={(e) => {
+            if (e.shiftKey && e.key === "Enter") return;
+
+            if (e.key === "Enter") {
+              e.preventDefault();
+              sendMessage();
+            }
+          }}
+          id="message"
+          onChange={(e) => setMessage(e.target.value)}
+          value={message ? message : ""}
+          placeholder="Type here..."
+          className="hidden sm:inline px-2 mr-2 min-h-[50px] max-h-[100px] w-full bg-gray-500 outline-none rounded"
+        />
         <textarea
           id="message"
           onChange={(e) => setMessage(e.target.value)}
           value={message ? message : ""}
           placeholder="Type here..."
-          className="px-2 mr-2 min-h-[50px] max-h-[100px] w-full bg-gray-500 outline-none rounded"
-        ></textarea>
+          className="sm:hidden px-2 mr-2 min-h-[50px] max-h-[100px] w-full bg-gray-500 outline-none rounded"
+        />
         <button className="px-3 rounded-full bg-gray-200" type="submit">
           <ArrowUpIcon className="text-gray-600" height="20px" />
         </button>

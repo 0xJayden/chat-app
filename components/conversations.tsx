@@ -81,7 +81,7 @@ export default function Conversations({
     >
       <h1 className="p-5">Conversations</h1>
       {isSuccess && (
-        <div className="flex flex-col w-full">
+        <div className="flex flex-col w-full overflow-scroll">
           {conversations?.conversations.map((c) => (
             <div className="cursor-pointer p-2 border-b" key={c.id}>
               <XMarkIcon

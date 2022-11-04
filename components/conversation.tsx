@@ -58,10 +58,14 @@ export default function ConversationWindow({
     onSuccess(data) {
       setCurrentConversation(data.conversation);
     },
-    refetchInterval: 600,
+    refetchOnWindowFocus: false,
   });
 
-  const mutation = trpc.useMutation(["send-message"]);
+  const mutation = trpc.useMutation(["send-message"], {
+    onSuccess() {
+      query.refetch();
+    },
+  });
 
   const sendMessage = async () => {
     if (!message || !session?.user) return;
@@ -69,7 +73,6 @@ export default function ConversationWindow({
     if (!fromEmail || !convoId) return;
     mutation.mutate({ message, fromEmail, convoId });
     setMessage(null);
-    // setTimeout(() => query.refetch(), 600);
   };
 
   useEffect(scrollToBottom, [currentConversation]);
@@ -85,18 +88,17 @@ export default function ConversationWindow({
       <h1 className="text-white fixed top-10 bg-gray-700 p-2 w-full">
         {toUser?.email}
       </h1>
+      {query.isLoading && <div>Loading...</div>}
       {query.isSuccess && (
         <div className="flex flex-col w-full space-y-2 mb-[85px] overflow-scroll">
           {currentConversation?.messages.map((m) => (
-            <>
+            <div key={m.id}>
               <div
-                key={m.id}
                 className={`w-full flex ${
                   m.from !== fromEmail ? "justify-start" : "justify-end"
                 }`}
               >
                 <div
-                  key={m.conversationId}
                   className={`rounded px-5 py-2 max-w-[275px] ${
                     m.from !== fromEmail ? "bg-white" : "bg-red-500"
                   }`}
@@ -104,7 +106,7 @@ export default function ConversationWindow({
                   <p className="overflow-auto">{m.message}</p>
                 </div>
               </div>
-            </>
+            </div>
           ))}
           <div ref={messagesEndRef} />
         </div>

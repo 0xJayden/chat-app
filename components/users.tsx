@@ -68,7 +68,7 @@ export default function Users({
         })
       | undefined
   ) => {
-    if (!user) return;
+    if (!user || user.email === session?.user?.email) return;
     setToUser(user);
 
     const toUserId = user.id;
@@ -109,26 +109,55 @@ export default function Users({
 
   return (
     <div
-      className={`flex flex-col fixed right-0 z-10 top-10 items-center p-5 border-l h-full bg-gray-600 ${
+      className={`flex flex-col fixed right-0 z-10 top-10 items-center p-5 border-l h-full bg-gray-700 ${
         openUsers
           ? "opacity-100 transition duration-500 ease-out"
           : "opacity-0 translate-x-full transition duration-500 ease-out"
       }`}
     >
-      <h1>Users</h1>
-      {users?.users.map((u) => (
-        <div className="cursor-pointer border-b w-full" key={u.email}>
-          <p
-            className="p-2"
-            onClick={() => {
-              if (!u) return;
-              startConversation(u);
-            }}
-          >
-            {u.email}
-          </p>
-        </div>
-      ))}
+      <h1>Account</h1>
+      <p className="py-2 border-b cursor-pointer">{session?.user?.email}</p>
+      <h1 className="pt-5 pb-3">Users</h1>
+      <>
+        <h1 className="text-green-500">Online</h1>
+        {users?.users.map(
+          (u) =>
+            u.email !== session?.user?.email &&
+            u.sessions.length > 0 && (
+              <div className="cursor-pointer border-b w-full" key={u.email}>
+                <p
+                  className="p-2"
+                  onClick={() => {
+                    if (!u) return;
+                    startConversation(u);
+                  }}
+                >
+                  {u.email}
+                </p>
+              </div>
+            )
+        )}
+      </>
+      <>
+        <h1 className="text-red-500 pt-5">Offline</h1>
+        {users?.users.map(
+          (u) =>
+            u.email !== session?.user?.email &&
+            u.sessions.length === 0 && (
+              <div className="cursor-pointer border-b w-full" key={u.email}>
+                <p
+                  className="p-2"
+                  onClick={() => {
+                    if (!u) return;
+                    startConversation(u);
+                  }}
+                >
+                  {u.email}
+                </p>
+              </div>
+            )
+        )}
+      </>
     </div>
   );
 }

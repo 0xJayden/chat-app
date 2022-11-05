@@ -17,6 +17,7 @@ export default function Chat() {
   const [openMenu, setOpenMenu] = useState(false);
   const [openUsers, setOpenUsers] = useState(false);
   const [convoId, setConversationId] = useState<number>(0);
+  const [openHi, setOpenHi] = useState(false);
   const [toUser, setToUser] = useState<
     | (User & {
         conversations: (Conversation & {
@@ -39,16 +40,26 @@ export default function Chat() {
   >();
 
   const { data: session } = useSession();
-  const { data: users } = trpc.useQuery(["get-users"]);
+  const { data: users, refetch } = trpc.useQuery(["get-users"]);
+
+  const refetchUsers = async () => {
+    await refetch();
+    setOpenHi(true);
+    setTimeout(() => setOpenHi(false), 3000);
+  };
 
   useEffect(() => {
     if (session && session.user?.email) {
       setFromEmail(session.user.email);
+      const fromUser = users?.users.find(
+        (u) => u.email === session?.user?.email
+      );
+      setFromUser(fromUser);
     }
     if (!session) {
       router.push("/");
     }
-  }, []);
+  }, [users]);
 
   return (
     <Layout>
@@ -59,7 +70,9 @@ export default function Chat() {
         openUsers={openUsers}
       />
       <div className="w-full flex justify-center items-end h-20">
-        <h1 className="text-white">welcome {session?.user?.email}</h1>
+        <h1 className="text-white">
+          welcome {fromUser?.name ? fromUser.name : session?.user?.email}
+        </h1>
       </div>
       <Conversations
         fromEmail={fromEmail}
@@ -87,6 +100,11 @@ export default function Chat() {
         openUsers={openUsers}
         setOpenUsers={setOpenUsers}
         setConversationId={setConversationId}
+        fromUser={fromUser}
+        refetchUsers={refetchUsers}
+        fromEmail={fromEmail}
+        openHi={openHi}
+        setOpenHi={setOpenHi}
       />
     </Layout>
   );

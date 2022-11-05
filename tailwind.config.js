@@ -6,7 +6,19 @@ module.exports = {
     "./node_modules/tw-elements/dist/js/**/*.js",
   ],
   theme: {
-    extend: {},
+    extend: {
+      keyframes: {
+        popup: {
+          "0%": { bottom: "0px", left: "0px", right: "0px" },
+          "25%": { bottom: "150px" },
+          "50%": { opacity: "100%" },
+          "100%": { bottom: "150px", opacity: "0%" },
+        },
+      },
+      animation: {
+        popup: "popup 3s ease-out",
+      },
+    },
   },
   plugins: [
     require("tw-elements/dist/plugin"),

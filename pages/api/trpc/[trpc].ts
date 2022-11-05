@@ -131,6 +131,20 @@ export const appRouter = trpc
         },
       });
     },
+  })
+  .mutation("set-name", {
+    input: z.object({
+      fromEmail: z.string(),
+      name: z.string(),
+    }),
+    async resolve({ input }) {
+      const user = await prisma.user.update({
+        where: { email: input.fromEmail },
+        data: {
+          name: input.name,
+        },
+      });
+    },
   });
 
 // ({

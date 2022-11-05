@@ -98,7 +98,7 @@ export default function ConversationWindow({
       className="flex flex-col w-full h-full min-h-[700px] pt-5 px-5 items-center justify-between relative"
     >
       <h1 className="text-white fixed top-10 bg-gray-700 p-2 w-full">
-        {toUser?.email}
+        {toUser?.name ? toUser.name : toUser?.email}
       </h1>
       {query.isLoading && <div>Loading...</div>}
       {query.isSuccess && (
@@ -140,7 +140,7 @@ export default function ConversationWindow({
               sendMessage();
             }
           }}
-          id="message"
+          id="desktop-message"
           onChange={(e) => setMessage(e.target.value)}
           value={message ? message : ""}
           placeholder="Type here..."

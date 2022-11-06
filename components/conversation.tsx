@@ -91,9 +91,9 @@ export default function ConversationWindow({
     setMessage(null);
   };
 
-  const newLine = () => {
-    document.addEventListener("keydown", (e) => {});
-  };
+  // const newLine = () => {
+  //   document.addEventListener("keydown", (e) => {});
+  // };
 
   useEffect(scrollToBottom, [currentConversation]);
 

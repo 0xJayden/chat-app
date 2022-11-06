@@ -1,12 +1,5 @@
 import { NextSession } from "../utils/utils";
-import {
-  BaseSyntheticEvent,
-  Dispatch,
-  SetStateAction,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import { trpc } from "../utils/trpc";
 import { User, Conversation, Session, Message } from "@prisma/client";
 import { ArrowUpIcon } from "@heroicons/react/24/outline";

@@ -122,7 +122,7 @@ export const appRouter = trpc
       convoId: z.number(),
     }),
     async resolve({ input }) {
-      const user = await prisma.user.update({
+      await prisma.user.update({
         where: { email: input.user },
         data: {
           conversations: {
@@ -138,7 +138,7 @@ export const appRouter = trpc
       name: z.string(),
     }),
     async resolve({ input }) {
-      const user = await prisma.user.update({
+      await prisma.user.update({
         where: { email: input.fromEmail },
         data: {
           name: input.name,
@@ -152,7 +152,7 @@ export const appRouter = trpc
       amount: z.number(),
     }),
     async resolve({ input }) {
-      const user = await prisma.user.update({
+      await prisma.user.update({
         where: { email: input.fromEmail },
         data: {
           messagesSent: input.amount,
@@ -166,7 +166,7 @@ export const appRouter = trpc
       amount: z.number(),
     }),
     async resolve({ input }) {
-      const user = await prisma.user.update({
+      await prisma.user.update({
         where: { email: input.fromEmail },
         data: {
           coins: input.amount,

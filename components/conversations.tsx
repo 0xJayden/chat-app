@@ -1,6 +1,5 @@
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { Conversation, Message, Session, User } from "@prisma/client";
-import { useSession } from "next-auth/react";
 import { trpc } from "../utils/trpc";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 
@@ -43,8 +42,6 @@ export default function Conversations({
   setToUser,
   setOpenMenu,
 }: ConversationsInterface) {
-  const { data: session } = useSession();
-
   const [openDeleteConvo, setOpenDeleteConvo] = useState(false);
   const [convoId, setConvoId] = useState<number>();
 

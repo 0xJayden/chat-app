@@ -3,10 +3,8 @@ import { Dispatch, SetStateAction, useState } from "react";
 import { trpc } from "../utils/trpc";
 import { Conversation, User, Session, Message } from "@prisma/client";
 import { XMarkIcon } from "@heroicons/react/24/outline";
-import { notifyManager } from "@tanstack/react-query";
 interface UsersInterface {
   session: NextSession | null;
-  setOpenConversation: Dispatch<SetStateAction<boolean>>;
   users:
     | {
         users: (User & {
@@ -64,7 +62,6 @@ interface UsersInterface {
 
 export default function Users({
   session,
-  setOpenConversation,
   users,
   setFromUser,
   setToUser,
@@ -128,11 +125,9 @@ export default function Users({
       {
         onSuccess(data: { success: boolean; conversation: Conversation }) {
           setConversationId(data.conversation.id);
-          setOpenConversation(true);
         },
       }
     );
-    setOpenConversation(true);
     setOpenUsers(false);
   };
 

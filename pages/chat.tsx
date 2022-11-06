@@ -13,7 +13,6 @@ export default function Chat() {
   const router = useRouter();
 
   const [fromEmail, setFromEmail] = useState<string>("");
-  const [openConversation, setOpenConversation] = useState(false);
   const [openMenu, setOpenMenu] = useState(false);
   const [openUsers, setOpenUsers] = useState(false);
   const [convoId, setConversationId] = useState<number>(0);
@@ -108,7 +107,6 @@ export default function Chat() {
       />
       <Users
         session={session}
-        setOpenConversation={setOpenConversation}
         users={users}
         setFromUser={setFromUser}
         setToUser={setToUser}

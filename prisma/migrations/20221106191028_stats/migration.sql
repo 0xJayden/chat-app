@@ -1,0 +1,4 @@
+-- AlterTable
+ALTER TABLE `User` ADD COLUMN `age` INTEGER NULL,
+    ADD COLUMN `coins` INTEGER NULL,
+    ADD COLUMN `messagesSent` INTEGER NULL;

@@ -35,6 +35,7 @@ interface ConversationWindowInterface {
   fromEmail: string;
   setOpenMenu: Dispatch<SetStateAction<boolean>>;
   setOpenUsers: Dispatch<SetStateAction<boolean>>;
+  refetchUsers2: () => Promise<void>;
 }
 
 export default function ConversationWindow({
@@ -45,6 +46,7 @@ export default function ConversationWindow({
   fromEmail,
   setOpenMenu,
   setOpenUsers,
+  refetchUsers2,
 }: ConversationWindowInterface) {
   const [message, setMessage] = useState<string | null>(null);
   const [currentConversation, setCurrentConversation] = useState<
@@ -72,14 +74,27 @@ export default function ConversationWindow({
   const mutation = trpc.useMutation(["send-message"], {
     onSuccess() {
       query.refetch();
+      refetchUsers2();
     },
   });
 
+  const addOneToMessage = trpc.useMutation(["add-1-to-messages"]);
+
   const sendMessage = async () => {
-    if (!message || !session?.user) return;
-    // console.log("email", fromEmail, "user", fromUser, convoId);
-    if (!fromEmail || !convoId) return;
+    if (!message || !session?.user || !fromEmail || !convoId || !fromUser)
+      return;
+
     mutation.mutate({ message, fromEmail, convoId });
+
+    if (!fromUser.messagesSent) {
+      const amount = 1;
+      addOneToMessage.mutate({ fromEmail, amount });
+    } else {
+      const amount = fromUser.messagesSent + 1;
+
+      addOneToMessage.mutate({ fromEmail, amount });
+    }
+
     setMessage(null);
   };
 
@@ -95,7 +110,7 @@ export default function ConversationWindow({
         setOpenMenu(false);
         setOpenUsers(false);
       }}
-      className="flex flex-col w-full h-full min-h-[700px] pt-5 px-5 items-center justify-between relative"
+      className="flex overflow-hidden flex-col w-full h-full min-h-[700px] pt-5 px-5 items-center justify-between relative"
     >
       <h1 className="text-white fixed top-10 bg-gray-700 p-2 w-full">
         {toUser?.name ? toUser.name : toUser?.email}

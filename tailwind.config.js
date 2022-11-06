@@ -9,14 +9,20 @@ module.exports = {
     extend: {
       keyframes: {
         popup: {
-          "0%": { bottom: "0px", left: "0px", right: "0px" },
-          "25%": { bottom: "150px" },
+          "0%": { bottom: "0px", left: "0px", right: "0px", opacity: "0%" },
+          "25%": { bottom: "50px", opacity: "100%" },
           "50%": { opacity: "100%" },
-          "100%": { bottom: "150px", opacity: "0%" },
+          "100%": { bottom: "50px", opacity: "0%" },
+        },
+        separate: {
+          "0%": { margin: "0 0 0 0" },
+          "25%": { margin: "0 0 10px 0" },
+          "100%": { margin: "0 0 10px 0" },
         },
       },
       animation: {
         popup: "popup 3s ease-out",
+        separate: "separate 3s ease-out",
       },
     },
   },

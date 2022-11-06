@@ -3,6 +3,7 @@ import { Dispatch, SetStateAction, useState } from "react";
 import { trpc } from "../utils/trpc";
 import { Conversation, User, Session, Message } from "@prisma/client";
 import { XMarkIcon } from "@heroicons/react/24/outline";
+import { notifyManager } from "@tanstack/react-query";
 interface UsersInterface {
   session: NextSession | null;
   setOpenConversation: Dispatch<SetStateAction<boolean>>;
@@ -56,7 +57,9 @@ interface UsersInterface {
   refetchUsers: () => void;
   fromEmail: string;
   openHi: boolean;
-  setOpenHi: Dispatch<SetStateAction<boolean>>;
+  refetchUsers3: () => void;
+  popupCoins: boolean;
+  popup: boolean;
 }
 
 export default function Users({
@@ -72,13 +75,16 @@ export default function Users({
   refetchUsers,
   fromEmail,
   openHi,
-  setOpenHi,
+  refetchUsers3,
+  popupCoins,
+  popup,
 }: UsersInterface) {
   const [openProfile, setOpenProfile] = useState(false);
   const [name, setName] = useState("");
 
   const mutation = trpc.useMutation(["create-conversation"]);
   const setNameMutation = trpc.useMutation(["set-name"]);
+  const addCoins = trpc.useMutation(["add-to-coins"]);
 
   const startConversation = (
     user:
@@ -140,25 +146,73 @@ export default function Users({
         },
       }
     );
+
+    if (!fromUser?.coins) {
+      const amount = 100;
+
+      addCoins.mutate(
+        {
+          fromEmail,
+          amount,
+        },
+        {
+          onSuccess() {
+            refetchUsers3();
+          },
+        }
+      );
+    } else {
+      const amount = fromUser.coins + 100;
+
+      addCoins.mutate(
+        {
+          fromEmail,
+          amount,
+        },
+        {
+          onSuccess() {
+            refetchUsers3();
+          },
+        }
+      );
+    }
   };
 
   return (
     <>
-      {openHi && (
+      {popup && (
         <div
-          className={`sticky flex justify-center items-center z-30 animate-popup`}
+          className={`sticky space-y-2 flex flex-col justify-center items-center z-30 animate-popup`}
         >
-          <div
-            className={`flex flex-col justify-between items-center w-[300px] h-[100px] bg-green-500 rounded p-5 text-center text-2xl
+          {openHi && (
+            <div
+              className={`sticky flex justify-center items-center z-30 animate-separate`}
+            >
+              <div
+                className={`flex flex-col justify-between items-center w-[200px] h-[50px] bg-green-500 rounded p-5 text-center
           `}
-          >
-            <h1>Hi, {fromUser?.name}</h1>
-          </div>
+              >
+                <h1>Hi, {fromUser?.name}</h1>
+              </div>
+            </div>
+          )}
+          {popupCoins && (
+            <div
+              className={`sticky flex justify-center items-center z-30 animate-separate`}
+            >
+              <div
+                className={`flex flex-col justify-between items-center w-[200px] h-[50px] bg-green-500 rounded p-5 text-center
+          `}
+              >
+                <h1>+100 coins {fromUser?.coins}</h1>
+              </div>
+            </div>
+          )}
         </div>
       )}
       {openProfile && (
-        <div className="fixed flex inset-0 justify-center items-center z-20 backdrop-brightness-75">
-          <div className="flex flex-col space-y-3 text-center border border-gray-500 rounded h-[550px] w-[350px] p-2 bg-gray-700">
+        <div className="fixed flex inset-0 justify-center items-center z-20 backdrop-brightness-50 backdrop-blur-sm">
+          <div className="flex flex-col space-y-3 text-center border border-gray-500 rounded w-[350px] p-2">
             <XMarkIcon
               onClick={() => setOpenProfile(false)}
               className="cursor-pointer absolute rounded-full transition-all duration-200 ease-out hover:bg-red-500"
@@ -178,6 +232,19 @@ export default function Users({
             >
               Set Name
             </button>
+            <h1 className="font-normal">Stats</h1>
+            <div className="text-start flex justify-between">
+              <div>
+                <p>Messages sent: </p>
+                <p>Age: </p>
+                <p>Coins: </p>
+              </div>
+              <div>
+                <p>{fromUser?.messagesSent ? fromUser.messagesSent : 0}</p>
+                <p>{fromUser?.age ? fromUser.age : 0 + "s"}</p>
+                <p>{fromUser?.coins ? fromUser.coins : 0}</p>
+              </div>
+            </div>
           </div>
         </div>
       )}

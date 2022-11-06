@@ -145,6 +145,34 @@ export const appRouter = trpc
         },
       });
     },
+  })
+  .mutation("add-1-to-messages", {
+    input: z.object({
+      fromEmail: z.string(),
+      amount: z.number(),
+    }),
+    async resolve({ input }) {
+      const user = await prisma.user.update({
+        where: { email: input.fromEmail },
+        data: {
+          messagesSent: input.amount,
+        },
+      });
+    },
+  })
+  .mutation("add-to-coins", {
+    input: z.object({
+      fromEmail: z.string(),
+      amount: z.number(),
+    }),
+    async resolve({ input }) {
+      const user = await prisma.user.update({
+        where: { email: input.fromEmail },
+        data: {
+          coins: input.amount,
+        },
+      });
+    },
   });
 
 // ({

@@ -18,6 +18,8 @@ export default function Chat() {
   const [openUsers, setOpenUsers] = useState(false);
   const [convoId, setConversationId] = useState<number>(0);
   const [openHi, setOpenHi] = useState(false);
+  const [popupCoins, setPopupCoins] = useState(false);
+  const [popup, setPopup] = useState(false);
   const [toUser, setToUser] = useState<
     | (User & {
         conversations: (Conversation & {
@@ -45,7 +47,19 @@ export default function Chat() {
   const refetchUsers = async () => {
     await refetch();
     setOpenHi(true);
+    setPopup(true);
     setTimeout(() => setOpenHi(false), 3000);
+  };
+
+  const refetchUsers2 = async () => {
+    await refetch();
+  };
+
+  const refetchUsers3 = async () => {
+    await refetch();
+    setPopupCoins(true);
+    setTimeout(() => setPopupCoins(false), 3000);
+    setTimeout(() => setPopup(false), 3000);
   };
 
   useEffect(() => {
@@ -90,6 +104,7 @@ export default function Chat() {
         fromEmail={fromEmail}
         setOpenMenu={setOpenMenu}
         setOpenUsers={setOpenUsers}
+        refetchUsers2={refetchUsers2}
       />
       <Users
         session={session}
@@ -104,7 +119,9 @@ export default function Chat() {
         refetchUsers={refetchUsers}
         fromEmail={fromEmail}
         openHi={openHi}
-        setOpenHi={setOpenHi}
+        refetchUsers3={refetchUsers3}
+        popupCoins={popupCoins}
+        popup={popup}
       />
     </Layout>
   );

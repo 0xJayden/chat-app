@@ -340,7 +340,7 @@ export default function Users({
                 <UserCircleIcon className="h-6" />
               </p>
             ) : (
-              <img className="" src={fromUser.image} />
+              <img src={fromUser.image} />
             )}
           </div>
           <p>{fromUser?.name ? fromUser.name : session?.user?.email}</p>

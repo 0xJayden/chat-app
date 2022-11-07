@@ -114,7 +114,7 @@ export default function ConversationWindow({
                   <UserCircleIcon className="h-6" />
                 </p>
               ) : (
-                <img className="" src={toUser.image} />
+                <img src={toUser.image} />
               )}
             </div>
             {toUser?.name ? toUser.name : toUser?.email}

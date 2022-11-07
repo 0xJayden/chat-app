@@ -106,20 +106,18 @@ export default function ConversationWindow({
       className="flex overflow-hidden flex-col w-full h-full min-h-[700px] pt-5 px-5 items-center justify-between relative"
     >
       {toUser?.email && (
-        <>
-          <h1 className="text-white flex justify-center fixed top-10 bg-gray-700 p-2 w-full">
-            <div className="h-6 w-6 mr-2 overflow-hidden rounded-full">
-              {!toUser?.image ? (
-                <p>
-                  <UserCircleIcon className="h-6" />
-                </p>
-              ) : (
-                <img src={toUser.image} />
-              )}
-            </div>
-            {toUser?.name ? toUser.name : toUser?.email}
-          </h1>
-        </>
+        <div className="text-white flex justify-center fixed top-10 bg-gray-700 p-2 w-full">
+          <div className="h-6 w-6 mr-2 overflow-hidden rounded-full">
+            {!toUser?.image ? (
+              <p>
+                <UserCircleIcon className="h-6" />
+              </p>
+            ) : (
+              <img src={toUser.image} />
+            )}
+          </div>
+          {toUser?.name ? toUser.name : toUser?.email}
+        </div>
       )}
       {query.isLoading && <div>Loading...</div>}
       {query.isSuccess && (

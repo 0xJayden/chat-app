@@ -1,8 +1,18 @@
 import { NextSession } from "../utils/utils";
-import { Dispatch, SetStateAction, useState } from "react";
+import {
+  BaseSyntheticEvent,
+  Dispatch,
+  SetStateAction,
+  useRef,
+  useState,
+} from "react";
 import { trpc } from "../utils/trpc";
 import { Conversation, User, Session, Message } from "@prisma/client";
-import { XMarkIcon } from "@heroicons/react/24/outline";
+import {
+  UserCircleIcon,
+  UserIcon,
+  XMarkIcon,
+} from "@heroicons/react/24/outline";
 interface UsersInterface {
   session: NextSession | null;
   users:
@@ -58,6 +68,7 @@ interface UsersInterface {
   refetchUsers3: () => void;
   popupCoins: boolean;
   popup: boolean;
+  refetchUsers2: () => void;
 }
 
 export default function Users({
@@ -75,13 +86,18 @@ export default function Users({
   refetchUsers3,
   popupCoins,
   popup,
+  refetchUsers2,
 }: UsersInterface) {
   const [openProfile, setOpenProfile] = useState(false);
   const [name, setName] = useState("");
+  const [pfp, setPfp] = useState<string>();
+
+  const imageInputRef = useRef<HTMLInputElement>(null);
 
   const mutation = trpc.useMutation(["create-conversation"]);
   const setNameMutation = trpc.useMutation(["set-name"]);
   const addCoins = trpc.useMutation(["add-to-coins"]);
+  const addPfp = trpc.useMutation(["add-pfp"]);
 
   const startConversation = (
     user:
@@ -173,6 +189,40 @@ export default function Users({
     }
   };
 
+  const setProfilePicture = (e: BaseSyntheticEvent) => {
+    const selectedImage = e.target.files[0];
+
+    if (!selectedImage) return;
+
+    if (!["image/jpeg", "image/png"].includes(selectedImage.type)) return;
+
+    let fileReader = new FileReader();
+
+    fileReader.readAsDataURL(selectedImage);
+
+    fileReader.addEventListener("load", async (e) => {
+      if (
+        e.target == null ||
+        e.target.result == null ||
+        typeof e.target.result !== "string"
+      )
+        return;
+
+      const image = e.target.result;
+
+      addPfp.mutate(
+        { fromEmail, image },
+        {
+          onSuccess() {
+            refetchUsers2();
+          },
+        }
+      );
+
+      setPfp(e.target.result);
+    });
+  };
+
   return (
     <>
       {popup && (
@@ -223,9 +273,37 @@ export default function Users({
             />
             <button
               onClick={() => submitName()}
-              className="border border-gray-500 rounded py-2 px-4 bg-gray-200 text-gray-700"
+              className="border border-gray-500 rounded py-2 px-4"
             >
               Set Name
+            </button>
+            <div className="flex justify-center">
+              <div
+                onClick={() => imageInputRef.current?.click()}
+                className="overflow-hidden shadow-md bg-white ml-4 h-[90px] sm:h-[125px] w-[90px] sm:w-[125px] rounded-full border cursor-pointer hover:opacity-70"
+              >
+                <input
+                  className="text-xs ml-8 w-1/2"
+                  required
+                  type="file"
+                  name="photo"
+                  id="photo"
+                  onChange={setProfilePicture}
+                  ref={imageInputRef}
+                  hidden
+                ></input>
+                {pfp ? (
+                  <img src={pfp} />
+                ) : (
+                  <div className="flex h-full justify-center items-center">
+                    <UserIcon className="h-20 text-gray-400" />
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <button className="border border-gray-500 rounded py-2 px-4">
+              Set Photo
             </button>
             <h1 className="font-normal">Stats</h1>
             <div className="text-start flex justify-between">
@@ -251,12 +329,22 @@ export default function Users({
         }`}
       >
         <h1 className="text-lg font-normal">Account</h1>
-        <p
+
+        <div
           onClick={() => setOpenProfile(true)}
-          className="w-full text-center p-2 border-b border-gray-500 cursor-pointer hover:bg-gray-500 transition-all duration-300 ease-out"
+          className="flex justify-evenly w-full text-center p-2 border-b border-gray-500 cursor-pointer hover:bg-gray-500 transition-all duration-300 ease-out"
         >
-          {fromUser?.name ? fromUser.name : session?.user?.email}
-        </p>
+          <div className="h-6 w-6 overflow-hidden rounded-full">
+            {!fromUser?.image ? (
+              <p>
+                <UserCircleIcon className="h-6" />
+              </p>
+            ) : (
+              <img className="" src={fromUser.image} />
+            )}
+          </div>
+          <p>{fromUser?.name ? fromUser.name : session?.user?.email}</p>
+        </div>
         <h1 className="pt-5 pb-3 text-lg font-normal">Users</h1>
         <>
           <h1 className="text-green-500">Online</h1>

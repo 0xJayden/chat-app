@@ -120,6 +120,7 @@ export default function Chat() {
         refetchUsers3={refetchUsers3}
         popupCoins={popupCoins}
         popup={popup}
+        refetchUsers2={refetchUsers2}
       />
     </Layout>
   );

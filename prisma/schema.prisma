@@ -61,7 +61,7 @@ model User {
   name          String?
   email         String?        @unique
   emailVerified DateTime?
-  image         String?
+  image         String?        @db.LongText
   messagesSent  Int?
   age           Int?
   coins         Int?

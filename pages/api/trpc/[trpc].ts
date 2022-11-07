@@ -173,6 +173,20 @@ export const appRouter = trpc
         },
       });
     },
+  })
+  .mutation("add-pfp", {
+    input: z.object({
+      fromEmail: z.string(),
+      image: z.string(),
+    }),
+    async resolve({ input }) {
+      await prisma.user.update({
+        where: { email: input.fromEmail },
+        data: {
+          image: input.image,
+        },
+      });
+    },
   });
 
 // ({

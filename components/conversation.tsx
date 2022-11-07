@@ -2,7 +2,7 @@ import { NextSession } from "../utils/utils";
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import { trpc } from "../utils/trpc";
 import { User, Conversation, Session, Message } from "@prisma/client";
-import { ArrowUpIcon } from "@heroicons/react/24/outline";
+import { ArrowUpIcon, UserCircleIcon } from "@heroicons/react/24/outline";
 
 interface ConversationWindowInterface {
   session: NextSession | null;
@@ -105,9 +105,22 @@ export default function ConversationWindow({
       }}
       className="flex overflow-hidden flex-col w-full h-full min-h-[700px] pt-5 px-5 items-center justify-between relative"
     >
-      <h1 className="text-white fixed top-10 bg-gray-700 p-2 w-full">
-        {toUser?.name ? toUser.name : toUser?.email}
-      </h1>
+      {toUser?.email && (
+        <>
+          <h1 className="text-white flex justify-center fixed top-10 bg-gray-700 p-2 w-full">
+            <div className="h-6 w-6 mr-2 overflow-hidden rounded-full">
+              {!toUser?.image ? (
+                <p>
+                  <UserCircleIcon className="h-6" />
+                </p>
+              ) : (
+                <img className="" src={toUser.image} />
+              )}
+            </div>
+            {toUser?.name ? toUser.name : toUser?.email}
+          </h1>
+        </>
+      )}
       {query.isLoading && <div>Loading...</div>}
       {query.isSuccess && (
         <div className="flex flex-col w-full space-y-2 mb-[85px] overflow-scroll">

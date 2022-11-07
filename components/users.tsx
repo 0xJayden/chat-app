@@ -189,39 +189,39 @@ export default function Users({
     }
   };
 
-  // const setProfilePicture = (e: BaseSyntheticEvent) => {
-  //   const selectedImage = e.target.files[0];
+  const setProfilePicture = (e: BaseSyntheticEvent) => {
+    const selectedImage = e.target.files[0];
 
-  //   if (!selectedImage) return;
+    if (!selectedImage) return;
 
-  //   if (!["image/jpeg", "image/png"].includes(selectedImage.type)) return;
+    if (!["image/jpeg", "image/png"].includes(selectedImage.type)) return;
 
-  //   let fileReader = new FileReader();
+    let fileReader = new FileReader();
 
-  //   fileReader.readAsDataURL(selectedImage);
+    fileReader.readAsDataURL(selectedImage);
 
-  //   fileReader.addEventListener("load", async (e) => {
-  //     if (
-  //       e.target == null ||
-  //       e.target.result == null ||
-  //       typeof e.target.result !== "string"
-  //     )
-  //       return;
+    fileReader.addEventListener("load", async (e) => {
+      if (
+        e.target == null ||
+        e.target.result == null ||
+        typeof e.target.result !== "string"
+      )
+        return;
 
-  //     const image = e.target.result;
+      const image = e.target.result;
 
-  //     addPfp.mutate(
-  //       { fromEmail, image },
-  //       {
-  //         onSuccess() {
-  //           refetchUsers2();
-  //         },
-  //       }
-  //     );
+      addPfp.mutate(
+        { fromEmail, image },
+        {
+          onSuccess() {
+            refetchUsers2();
+          },
+        }
+      );
 
-  //     setPfp(e.target.result);
-  //   });
-  // };
+      setPfp(e.target.result);
+    });
+  };
 
   return (
     <>
@@ -282,7 +282,7 @@ export default function Users({
                 onClick={() => imageInputRef.current?.click()}
                 className="overflow-hidden shadow-md bg-white ml-4 h-[90px] sm:h-[125px] w-[90px] sm:w-[125px] rounded-full border cursor-pointer hover:opacity-70"
               >
-                {/* <input
+                <input
                   className="text-xs ml-8 w-1/2"
                   required
                   type="file"
@@ -291,7 +291,7 @@ export default function Users({
                   onChange={setProfilePicture}
                   ref={imageInputRef}
                   hidden
-                ></input> */}
+                ></input>
                 {pfp ? (
                   <img src={pfp} />
                 ) : (

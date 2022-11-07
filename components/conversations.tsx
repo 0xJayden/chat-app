@@ -54,6 +54,9 @@ export default function Conversations({
     onError(err) {
       console.log(err, "err");
     },
+    refetchInterval: false,
+    refetchOnReconnect: false,
+    refetchOnWindowFocus: false,
   });
 
   const mutation = trpc.useMutation(["remove-user"], {

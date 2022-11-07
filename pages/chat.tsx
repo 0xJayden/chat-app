@@ -20,20 +20,25 @@ export default function Chat() {
   const [popupCoins, setPopupCoins] = useState(false);
   const [popup, setPopup] = useState(false);
   const [toUser, setToUser] = useState<
-    | (User & {
-        conversations: (Conversation & {
-          messages: Message[];
-          users: User[];
-        })[];
+    | {
+        id: string;
+        email: string | null;
+        name: string | null;
         sessions: Session[];
-      })
+      }
     | undefined
   >();
   const [fromUser, setFromUser] = useState<
     | (User & {
         conversations: (Conversation & {
           messages: Message[];
-          users: User[];
+          users: (User & {
+            conversations: (Conversation & {
+              messages: Message[];
+              users: User[];
+            })[];
+            sessions: Session[];
+          })[];
         })[];
         sessions: Session[];
       })
@@ -41,21 +46,35 @@ export default function Chat() {
   >();
 
   const { data: session } = useSession();
-  const { data: users, refetch } = trpc.useQuery(["get-users"]);
+  const { data: users, refetch: refetchUsers } = trpc.useQuery(["get-users"]);
+  const { data: profile, refetch: refetchProfile } = trpc.useQuery([
+    "get-profile",
+    { fromEmail },
+  ]);
 
-  const refetchUsers = async () => {
-    await refetch();
+  const {
+    data: conversations,
+    isSuccess,
+    isLoading,
+    refetch: refetchConversations,
+  } = trpc.useQuery(["get-conversations", { fromEmail }], {
+    onError(err) {
+      console.log(err, "err");
+    },
+    refetchInterval: false,
+    refetchOnReconnect: false,
+    refetchOnWindowFocus: false,
+  });
+
+  const callRefetchUsers = async () => {
+    await refetchUsers();
     setOpenHi(true);
     setPopup(true);
     setTimeout(() => setOpenHi(false), 3000);
   };
 
-  const refetchUsers2 = async () => {
-    await refetch();
-  };
-
-  const refetchUsers3 = async () => {
-    await refetch();
+  const callRefetchUsersCoins = async () => {
+    await refetchUsers();
     setPopupCoins(true);
     setTimeout(() => setPopupCoins(false), 3000);
     setTimeout(() => setPopup(false), 3000);
@@ -64,10 +83,10 @@ export default function Chat() {
   useEffect(() => {
     if (session && session.user?.email) {
       setFromEmail(session.user.email);
-      const fromUser = users?.users.find(
-        (u) => u.email === session?.user?.email
-      );
-      setFromUser(fromUser);
+      // const fromUser = users?.users.find(
+      //   (u) => u.email === session?.user?.email
+      // );
+      // setFromUser(fromUser);
     }
     if (!session) {
       router.push("/");
@@ -91,36 +110,39 @@ export default function Chat() {
         fromEmail={fromEmail}
         openMenu={openMenu}
         setConversationId={setConversationId}
-        setFromUser={setFromUser}
         setToUser={setToUser}
         setOpenMenu={setOpenMenu}
+        conversations={conversations}
+        refetchConversations={refetchConversations}
+        isLoading={isLoading}
+        isSuccess={isSuccess}
       />
       <ConversationWindow
         session={session}
         toUser={toUser}
-        fromUser={fromUser}
         convoId={convoId}
         fromEmail={fromEmail}
         setOpenMenu={setOpenMenu}
         setOpenUsers={setOpenUsers}
-        refetchUsers2={refetchUsers2}
+        refetchUsers={refetchUsers}
+        profile={profile}
       />
       <Users
         session={session}
         users={users}
-        setFromUser={setFromUser}
         setToUser={setToUser}
         openUsers={openUsers}
         setOpenUsers={setOpenUsers}
         setConversationId={setConversationId}
-        fromUser={fromUser}
-        refetchUsers={refetchUsers}
+        callRefetchUsers={callRefetchUsers}
         fromEmail={fromEmail}
         openHi={openHi}
-        refetchUsers3={refetchUsers3}
+        callRefetchUsersCoins={callRefetchUsersCoins}
         popupCoins={popupCoins}
         popup={popup}
-        refetchUsers2={refetchUsers2}
+        refetchProfile={refetchProfile}
+        conversations={conversations}
+        profile={profile}
       />
     </Layout>
   );

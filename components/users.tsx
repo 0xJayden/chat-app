@@ -13,80 +13,108 @@ import {
   UserIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
+import internal from "stream";
+import {
+  QueryObserverResult,
+  RefetchOptions,
+  RefetchQueryFilters,
+} from "react-query";
+import { TRPCClientErrorLike } from "@trpc/client";
 interface UsersInterface {
   session: NextSession | null;
   users:
     | {
-        users: (User & {
-          conversations: (Conversation & {
-            messages: Message[];
-            users: User[];
-          })[];
+        users: {
+          id: string;
+          email: string | null;
+          name: string | null;
           sessions: Session[];
-        })[];
+        }[];
       }
     | undefined;
-  setFromUser: Dispatch<
-    SetStateAction<
-      | (User & {
-          conversations: (Conversation & {
-            messages: Message[];
-            users: User[];
-          })[];
-          sessions: Session[];
-        })
-      | undefined
-    >
-  >;
   setToUser: Dispatch<
     SetStateAction<
-      | (User & {
-          conversations: (Conversation & {
-            messages: Message[];
-            users: User[];
-          })[];
+      | {
+          id: string;
+          email: string | null;
+          name: string | null;
           sessions: Session[];
-        })
+        }
       | undefined
     >
   >;
   openUsers: boolean;
   setOpenUsers: Dispatch<SetStateAction<boolean>>;
   setConversationId: Dispatch<SetStateAction<number>>;
-  fromUser:
-    | (User & {
-        conversations: (Conversation & {
-          messages: Message[];
-          users: User[];
-        })[];
-        sessions: Session[];
-      })
-    | undefined;
-  refetchUsers: () => void;
+  callRefetchUsers: () => void;
   fromEmail: string;
   openHi: boolean;
-  refetchUsers3: () => void;
+  callRefetchUsersCoins: () => void;
   popupCoins: boolean;
   popup: boolean;
-  refetchUsers2: () => void;
+  refetchProfile: <TPageData>(
+    options?: (RefetchOptions & RefetchQueryFilters<TPageData>) | undefined
+  ) => Promise<
+    QueryObserverResult<
+      {
+        profile: {
+          id: string;
+          email: string | null;
+          name: string | null;
+          sessions: Session[];
+          image: string | null;
+          coins: number | null;
+          messagesSent: number | null;
+          age: number | null;
+        } | null;
+      },
+      TRPCClientErrorLike<any>
+    >
+  >;
+  conversations:
+    | {
+        conversations: {
+          recentMessage: string | null;
+          users: {
+            email: string | null;
+            name: string | null;
+          }[];
+          id: number;
+        }[];
+      }
+    | undefined;
+  profile:
+    | {
+        profile: {
+          id: string;
+          email: string | null;
+          name: string | null;
+          sessions: Session[];
+          image: string | null;
+          coins: number | null;
+          messagesSent: number | null;
+          age: number | null;
+        } | null;
+      }
+    | undefined;
 }
 
 export default function Users({
   session,
   users,
-  setFromUser,
   setToUser,
   openUsers,
   setOpenUsers,
   setConversationId,
-  fromUser,
-  refetchUsers,
+  callRefetchUsers,
   fromEmail,
   openHi,
-  refetchUsers3,
+  callRefetchUsersCoins,
   popupCoins,
   popup,
-  refetchUsers2,
+  refetchProfile,
+  conversations,
+  profile,
 }: UsersInterface) {
   const [openProfile, setOpenProfile] = useState(false);
   const [name, setName] = useState("");
@@ -101,36 +129,38 @@ export default function Users({
 
   const startConversation = (
     user:
-      | (User & {
-          conversations: (Conversation & {
-            messages: Message[];
-            users: User[];
-          })[];
+      | {
+          id: string;
+          email: string | null;
+          name: string | null;
           sessions: Session[];
-        })
+        }
       | undefined
   ) => {
     if (!user || user.email === session?.user?.email) return;
     setToUser(user);
 
     const toUserId = user.id;
+    const fromUserId = profile?.profile?.id;
 
-    const fromUser = users?.users.find((u) => u.email === session?.user?.email);
-    setFromUser(fromUser);
-    if (!fromUser) return;
+    if (!fromUserId) return;
 
-    const fromUserId = fromUser.id;
+    // const fromUser = users?.users.find((u) => u.email === session?.user?.email);
+    // setFromUser(fromUser);
+    // if (!fromUser) return;
 
-    console.log("to", user);
-    console.log("from", fromUser);
+    // const fromUserId = fromUser.id;
 
-    const existingUserInConvo = fromUser.conversations.find((c) =>
+    // console.log("to", user);
+    // console.log("from", fromUser);
+
+    const existingUserInConvo = conversations?.conversations.find((c) =>
       c.users.find((u) => u.email === user.email)
     );
 
     if (
       existingUserInConvo &&
-      existingUserInConvo.users.find((u) => u.email === fromUser.email)
+      existingUserInConvo.users.find((u) => u.email === profile?.profile?.email)
     ) {
       setOpenUsers(false);
       return;
@@ -152,13 +182,13 @@ export default function Users({
       { fromEmail, name },
       {
         onSuccess() {
-          refetchUsers();
+          callRefetchUsers();
           setName("");
         },
       }
     );
 
-    if (!fromUser?.coins) {
+    if (!profile?.profile?.coins) {
       const amount = 100;
 
       addCoins.mutate(
@@ -168,12 +198,12 @@ export default function Users({
         },
         {
           onSuccess() {
-            refetchUsers3();
+            callRefetchUsersCoins();
           },
         }
       );
     } else {
-      const amount = fromUser.coins + 100;
+      const amount = profile.profile.coins + 100;
 
       addCoins.mutate(
         {
@@ -182,7 +212,7 @@ export default function Users({
         },
         {
           onSuccess() {
-            refetchUsers3();
+            callRefetchUsersCoins();
           },
         }
       );
@@ -214,7 +244,7 @@ export default function Users({
         { fromEmail, image },
         {
           onSuccess() {
-            refetchUsers2();
+            refetchProfile();
           },
         }
       );
@@ -237,7 +267,7 @@ export default function Users({
                 className={`flex flex-col justify-between items-center w-[200px] h-[50px] bg-green-500 rounded p-5 text-center
           `}
               >
-                <h1>Hi, {fromUser?.name}</h1>
+                <h1>Hi, {profile?.profile?.name}</h1>
               </div>
             </div>
           )}
@@ -249,7 +279,7 @@ export default function Users({
                 className={`flex flex-col justify-between items-center w-[200px] h-[50px] bg-green-500 rounded p-5 text-center
           `}
               >
-                <h1>+100 coins {fromUser?.coins}</h1>
+                <h1>+100 coins {profile?.profile?.coins}</h1>
               </div>
             </div>
           )}
@@ -264,7 +294,10 @@ export default function Users({
               height="15px"
             />
             <h1 className="font-normal text-lg">Profile</h1>
-            <p>Current name: {fromUser?.name ? fromUser.name : "None"}</p>
+            <p>
+              Current name:{" "}
+              {profile?.profile?.name ? profile.profile.name : "None"}
+            </p>
             <input
               value={name ? name : ""}
               onChange={(e) => setName(e.target.value)}
@@ -313,9 +346,13 @@ export default function Users({
                 <p>Coins: </p>
               </div>
               <div>
-                <p>{fromUser?.messagesSent ? fromUser.messagesSent : 0}</p>
-                <p>{fromUser?.age ? fromUser.age : 0 + "s"}</p>
-                <p>{fromUser?.coins ? fromUser.coins : 0}</p>
+                <p>
+                  {profile?.profile?.messagesSent
+                    ? profile.profile.messagesSent
+                    : 0}
+                </p>
+                <p>{profile?.profile?.age ? profile.profile.age : 0 + "s"}</p>
+                <p>{profile?.profile?.coins ? profile.profile.coins : 0}</p>
               </div>
             </div>
           </div>
@@ -335,15 +372,19 @@ export default function Users({
           className="flex justify-evenly w-full text-center p-2 border-b border-gray-500 cursor-pointer hover:bg-gray-500 transition-all duration-300 ease-out"
         >
           <div className="h-6 w-6 overflow-hidden rounded-full">
-            {!fromUser?.image ? (
+            {!profile?.profile?.image ? (
               <p>
                 <UserCircleIcon className="h-6" />
               </p>
             ) : (
-              <img src={fromUser.image} />
+              <img src={profile.profile.image} />
             )}
           </div>
-          <p>{fromUser?.name ? fromUser.name : session?.user?.email}</p>
+          <p>
+            {profile?.profile?.name
+              ? profile.profile.name
+              : session?.user?.email}
+          </p>
         </div>
         <h1 className="pt-5 pb-3 text-lg font-normal">Users</h1>
         <>

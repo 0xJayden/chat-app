@@ -3,43 +3,68 @@ import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import { trpc } from "../utils/trpc";
 import { User, Conversation, Session, Message } from "@prisma/client";
 import { ArrowUpIcon, UserCircleIcon } from "@heroicons/react/24/outline";
+import {
+  QueryObserverResult,
+  RefetchOptions,
+  RefetchQueryFilters,
+} from "react-query";
+import { TRPCClientErrorLike } from "@trpc/client";
 
 interface ConversationWindowInterface {
   session: NextSession | null;
   toUser:
-    | (User & {
-        conversations: (Conversation & {
-          messages: Message[];
-          users: User[];
-        })[];
+    | {
+        id: string;
+        email: string | null;
+        name: string | null;
         sessions: Session[];
-      })
+      }
     | undefined;
-  fromUser:
-    | (User & {
-        conversations: (Conversation & {
-          messages: Message[];
-          users: User[];
-        })[];
-        sessions: Session[];
-      })
-    | undefined;
+
   convoId: number;
   fromEmail: string;
   setOpenMenu: Dispatch<SetStateAction<boolean>>;
   setOpenUsers: Dispatch<SetStateAction<boolean>>;
-  refetchUsers2: () => Promise<void>;
+  refetchUsers: <TPageData>(
+    options?: (RefetchOptions & RefetchQueryFilters<TPageData>) | undefined
+  ) => Promise<
+    QueryObserverResult<
+      {
+        users: {
+          id: string;
+          email: string | null;
+          name: string | null;
+          sessions: Session[];
+        }[];
+      },
+      TRPCClientErrorLike<any>
+    >
+  >;
+  profile:
+    | {
+        profile: {
+          id: string;
+          email: string | null;
+          name: string | null;
+          sessions: Session[];
+          image: string | null;
+          coins: number | null;
+          messagesSent: number | null;
+          age: number | null;
+        } | null;
+      }
+    | undefined;
 }
 
 export default function ConversationWindow({
   session,
   toUser,
-  fromUser,
   convoId,
   fromEmail,
   setOpenMenu,
   setOpenUsers,
-  refetchUsers2,
+  refetchUsers,
+  profile,
 }: ConversationWindowInterface) {
   const [message, setMessage] = useState<string | null>(null);
   const [currentConversation, setCurrentConversation] = useState<
@@ -67,23 +92,23 @@ export default function ConversationWindow({
   const mutation = trpc.useMutation(["send-message"], {
     onSuccess() {
       query.refetch();
-      refetchUsers2();
+      refetchUsers();
     },
   });
 
   const addOneToMessage = trpc.useMutation(["add-1-to-messages"]);
 
   const sendMessage = async () => {
-    if (!message || !session?.user || !fromEmail || !convoId || !fromUser)
+    if (!message || !session?.user || !fromEmail || !convoId || !profile)
       return;
 
     mutation.mutate({ message, fromEmail, convoId });
 
-    if (!fromUser.messagesSent) {
+    if (!profile.profile?.messagesSent) {
       const amount = 1;
       addOneToMessage.mutate({ fromEmail, amount });
     } else {
-      const amount = fromUser.messagesSent + 1;
+      const amount = profile.profile.messagesSent + 1;
 
       addOneToMessage.mutate({ fromEmail, amount });
     }
@@ -107,7 +132,7 @@ export default function ConversationWindow({
     >
       {toUser?.email && (
         <div className="text-white flex justify-center fixed top-10 bg-gray-700 p-2 w-full">
-          <div className="h-6 w-6 mr-2 overflow-hidden rounded-full">
+          {/* <div className="h-6 w-6 mr-2 overflow-hidden rounded-full">
             {!toUser?.image ? (
               <p>
                 <UserCircleIcon className="h-6" />
@@ -115,7 +140,7 @@ export default function ConversationWindow({
             ) : (
               <img src={toUser.image} />
             )}
-          </div>
+          </div> */}
           {toUser?.name ? toUser.name : toUser?.email}
         </div>
       )}

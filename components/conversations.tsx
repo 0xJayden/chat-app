@@ -2,44 +2,79 @@ import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { Conversation, Message, Session, User } from "@prisma/client";
 import { trpc } from "../utils/trpc";
 import { XMarkIcon } from "@heroicons/react/24/outline";
+import {
+  QueryObserverResult,
+  RefetchOptions,
+  RefetchQueryFilters,
+} from "react-query";
+import { TRPCClientErrorLike } from "@trpc/client";
 
 interface ConversationsInterface {
   fromEmail: string;
   openMenu: boolean;
   setConversationId: Dispatch<SetStateAction<number>>;
-  setFromUser: Dispatch<SetStateAction<User | undefined>>;
-  setToUser: Dispatch<SetStateAction<User | undefined>>;
+  setToUser: Dispatch<
+    SetStateAction<
+      | {
+          id: string;
+          email: string | null;
+          name: string | null;
+          sessions: Session[];
+        }
+      | undefined
+    >
+  >;
   setOpenMenu: Dispatch<SetStateAction<boolean>>;
+  conversations:
+    | {
+        conversations: {
+          recentMessage: string | null;
+          users: {
+            id: string;
+            email: string | null;
+            name: string | null;
+            sessions: Session[];
+          }[];
+          id: number;
+        }[];
+      }
+    | undefined;
+  refetchConversations: <TPageData>(
+    options?: (RefetchOptions & RefetchQueryFilters<TPageData>) | undefined
+  ) => Promise<
+    QueryObserverResult<
+      | {
+          conversations: {
+            recentMessage: string | null;
+            users: {}[];
+            id: number;
+          }[];
+        }
+      | undefined,
+      TRPCClientErrorLike<any>
+    >
+  >;
+  isLoading: boolean;
+  isSuccess: boolean;
 }
 
 export default function Conversations({
   fromEmail,
   openMenu,
   setConversationId,
-  setFromUser,
   setToUser,
   setOpenMenu,
+  conversations,
+  refetchConversations,
+  isLoading,
+  isSuccess,
 }: ConversationsInterface) {
   const [openDeleteConvo, setOpenDeleteConvo] = useState(false);
   const [convoId, setConvoId] = useState<number>();
 
-  const {
-    data: conversations,
-    isSuccess,
-    isLoading,
-    refetch,
-  } = trpc.useQuery(["get-conversations", { fromEmail }], {
-    onError(err) {
-      console.log(err, "err");
-    },
-    refetchInterval: false,
-    refetchOnReconnect: false,
-    refetchOnWindowFocus: false,
-  });
-
   const mutation = trpc.useMutation(["remove-user"], {
     onSuccess() {
-      refetch();
+      refetchConversations();
     },
   });
 
@@ -50,7 +85,7 @@ export default function Conversations({
   };
 
   useEffect(() => {
-    refetch();
+    refetchConversations();
   }, [openMenu]);
 
   return (
@@ -108,13 +143,7 @@ export default function Conversations({
                   className="cursor-pointer p-2 hover:bg-gray-500 transition-all duration-300 ease-out"
                   onClick={() => {
                     setConversationId(c.id);
-                    if (c.users[0].email === fromEmail) {
-                      setFromUser(c.users[0]);
-                      setToUser(c.users[1]);
-                    } else {
-                      setFromUser(c.users[1]);
-                      setToUser(c.users[0]);
-                    }
+                    setToUser(c.users.find((u) => u.email === fromEmail));
                     setOpenMenu(false);
                   }}
                 >
@@ -124,9 +153,7 @@ export default function Conversations({
                       : `No Users Left`}
                   </p>
                   <p className="text-gray-400 line-clamp-2 text-ellipsis text-sm">
-                    {c.messages.length > 0
-                      ? c.messages[c.messages.length - 1]?.message
-                      : "No messages yet..."}
+                    {c.recentMessage ? c.recentMessage : "No messages yet..."}
                   </p>
                 </div>
               </div>

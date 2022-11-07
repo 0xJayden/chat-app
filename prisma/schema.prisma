@@ -50,10 +50,11 @@ model Message {
 }
 
 model Conversation {
-  id          Int       @id @default(autoincrement())
-  timeCreated DateTime  @default(now())
-  messages    Message[]
-  users       User[]
+  id            Int       @id @default(autoincrement())
+  timeCreated   DateTime  @default(now())
+  recentMessage String?
+  messages      Message[]
+  users         User[]
 }
 
 model User {

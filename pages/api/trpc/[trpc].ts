@@ -57,6 +57,15 @@ export const appRouter = trpc
         },
       });
 
+      await prisma.conversation.update({
+        where: {
+          id: input.convoId,
+        },
+        data: {
+          recentMessage: input.message,
+        },
+      });
+
       return { success: true, message };
     },
   })
@@ -69,14 +78,41 @@ export const appRouter = trpc
         where: {
           email: input.fromEmail,
         },
-        include: {
+        select: {
+          name: true,
+          email: true,
           conversations: {
-            include: {
-              messages: true,
-              users: true,
+            select: {
+              id: true,
+              recentMessage: true,
+              users: {
+                select: {
+                  id: true,
+                  email: true,
+                  name: true,
+                  sessions: true,
+                },
+              },
             },
           },
         },
+        // include: {
+        //   conversations: {
+        //     include: {
+        //       messages: true,
+        //       users: {
+        //         include: {
+        //           conversations: {
+        //             include: {
+        //               messages: true,
+        //               users: true,
+        //             },
+        //           },
+        //         },
+        //       },
+        //     },
+        //   },
+        // },
       });
 
       if (!user) return;
@@ -91,18 +127,49 @@ export const appRouter = trpc
   .query("get-users", {
     async resolve() {
       const users = await prisma.user.findMany({
-        include: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
           sessions: true,
-          conversations: {
-            include: {
-              messages: true,
-              users: true,
-            },
-          },
         },
+        // include: {
+        //   sessions: true,
+        //   conversations: {
+        //     include: {
+        //       messages: true,
+        //       users: true,
+        //     },
+        //   },
+        // },
       });
       return {
         users,
+      };
+    },
+  })
+  .query("get-profile", {
+    input: z.object({
+      fromEmail: z.string(),
+    }),
+    async resolve({ input }) {
+      const profile = await prisma.user.findFirst({
+        where: {
+          email: input.fromEmail,
+        },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          sessions: true,
+          image: true,
+          coins: true,
+          messagesSent: true,
+          age: true,
+        },
+      });
+      return {
+        profile,
       };
     },
   })

@@ -73,17 +73,7 @@ export const appRouter = trpc
           conversations: {
             include: {
               messages: true,
-              users: {
-                include: {
-                  conversations: {
-                    include: {
-                      messages: true,
-                      users: true,
-                    },
-                  },
-                  sessions: true,
-                },
-              },
+              users: true,
             },
           },
         },

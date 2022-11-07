@@ -7,30 +7,8 @@ interface ConversationsInterface {
   fromEmail: string;
   openMenu: boolean;
   setConversationId: Dispatch<SetStateAction<number>>;
-  setFromUser: Dispatch<
-    SetStateAction<
-      | (User & {
-          conversations: (Conversation & {
-            messages: Message[];
-            users: User[];
-          })[];
-          sessions: Session[];
-        })
-      | undefined
-    >
-  >;
-  setToUser: Dispatch<
-    SetStateAction<
-      | (User & {
-          conversations: (Conversation & {
-            messages: Message[];
-            users: User[];
-          })[];
-          sessions: Session[];
-        })
-      | undefined
-    >
-  >;
+  setFromUser: Dispatch<SetStateAction<User | undefined>>;
+  setToUser: Dispatch<SetStateAction<User | undefined>>;
   setOpenMenu: Dispatch<SetStateAction<boolean>>;
 }
 

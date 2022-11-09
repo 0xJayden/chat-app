@@ -128,7 +128,7 @@ export default function ConversationWindow({
         setOpenMenu(false);
         setOpenUsers(false);
       }}
-      className="flex overflow-hidden flex-col w-full h-full min-h-[700px] pt-5 px-5 items-center justify-between relative"
+      className="flex flex-col pt-5 mt-10 px-5 items-center justify-between relative"
     >
       {toUser?.email && (
         <div className="text-white flex justify-center fixed top-10 bg-gray-700 p-2 w-full">
@@ -146,28 +146,26 @@ export default function ConversationWindow({
       )}
       {query.isLoading && <div>Loading...</div>}
       {query.isSuccess && (
-        <>
-          <div className="flex flex-col w-full space-y-2 mb-[85px] overflow-scroll">
-            {currentConversation?.messages.map((m) => (
-              <div key={m.id}>
+        <div className="flex flex-col w-full space-y-2 mb-[85px] overflow-scroll">
+          {currentConversation?.messages.map((m) => (
+            <div key={m.id}>
+              <div
+                className={`w-full flex ${
+                  m.from !== fromEmail ? "justify-start" : "justify-end"
+                }`}
+              >
                 <div
-                  className={`w-full flex ${
-                    m.from !== fromEmail ? "justify-start" : "justify-end"
+                  className={`rounded px-5 py-2 max-w-[275px] ${
+                    m.from !== fromEmail ? "bg-gray-500" : "bg-red-700"
                   }`}
                 >
-                  <div
-                    className={`rounded px-5 py-2 max-w-[275px] ${
-                      m.from !== fromEmail ? "bg-gray-500" : "bg-red-700"
-                    }`}
-                  >
-                    <p className="overflow-auto">{m.message}</p>
-                  </div>
+                  <p className="overflow-auto">{m.message}</p>
                 </div>
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
           <div ref={messagesEndRef} />
-        </>
+        </div>
       )}
 
       <form

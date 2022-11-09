@@ -131,6 +131,7 @@ export const appRouter = trpc
           id: true,
           name: true,
           email: true,
+          image: true,
           sessions: true,
         },
         // include: {

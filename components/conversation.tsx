@@ -146,26 +146,28 @@ export default function ConversationWindow({
       )}
       {query.isLoading && <div>Loading...</div>}
       {query.isSuccess && (
-        <div className="flex flex-col w-full space-y-2 mb-[85px] overflow-scroll">
-          {currentConversation?.messages.map((m) => (
-            <div key={m.id}>
-              <div
-                className={`w-full flex ${
-                  m.from !== fromEmail ? "justify-start" : "justify-end"
-                }`}
-              >
+        <>
+          <div className="flex flex-col w-full space-y-2 mb-[85px] overflow-scroll">
+            {currentConversation?.messages.map((m) => (
+              <div key={m.id}>
                 <div
-                  className={`rounded px-5 py-2 max-w-[275px] ${
-                    m.from !== fromEmail ? "bg-gray-500" : "bg-red-700"
+                  className={`w-full flex ${
+                    m.from !== fromEmail ? "justify-start" : "justify-end"
                   }`}
                 >
-                  <p className="overflow-auto">{m.message}</p>
+                  <div
+                    className={`rounded px-5 py-2 max-w-[275px] ${
+                      m.from !== fromEmail ? "bg-gray-500" : "bg-red-700"
+                    }`}
+                  >
+                    <p className="overflow-auto">{m.message}</p>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
           <div ref={messagesEndRef} />
-        </div>
+        </>
       )}
 
       <form

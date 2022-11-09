@@ -28,6 +28,7 @@ interface UsersInterface {
           id: string;
           email: string | null;
           name: string | null;
+          image: string | null;
           sessions: Session[];
         }[];
       }
@@ -369,9 +370,9 @@ export default function Users({
 
         <div
           onClick={() => setOpenProfile(true)}
-          className="flex justify-evenly w-full text-center p-2 border-b border-gray-500 cursor-pointer hover:bg-gray-500 transition-all duration-300 ease-out"
+          className="flex w-full text-center p-2 border-b border-gray-500 cursor-pointer hover:bg-gray-500 transition-all duration-300 ease-out"
         >
-          <div className="h-6 w-6 overflow-hidden rounded-full">
+          <div className="h-6 w-6 overflow-hidden rounded-full mr-2">
             {!profile?.profile?.image ? (
               <p>
                 <UserCircleIcon className="h-6" />
@@ -398,13 +399,20 @@ export default function Users({
                   key={u.email}
                 >
                   <p
-                    className="p-2"
+                    className="p-2 flex"
                     onClick={() => {
                       if (!u) return;
                       startConversation(u);
                     }}
                   >
-                    {u.name ? u.name : u.email}
+                    {u.image ? (
+                      <div className="h-6 w-6 overflow-hidden rounded-full">
+                        <img src={u.image} />
+                      </div>
+                    ) : (
+                      <UserCircleIcon className="h-6" />
+                    )}
+                    <p className="ml-2">{u.name ? u.name : u.email}</p>
                   </p>
                 </div>
               )
@@ -421,12 +429,19 @@ export default function Users({
                   key={u.email}
                 >
                   <p
-                    className="p-2"
+                    className="p-2 flex"
                     onClick={() => {
                       if (!u) return;
                       startConversation(u);
                     }}
                   >
+                    {u.image ? (
+                      <div className="h-6 w-6 overflow-hidden rounded-full mr-2">
+                        <img src={u.image} />
+                      </div>
+                    ) : (
+                      <UserCircleIcon className="h-6" />
+                    )}
                     {u.name ? u.name : u.email}
                   </p>
                 </div>

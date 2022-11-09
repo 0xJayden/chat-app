@@ -28,22 +28,6 @@ export default function Chat() {
       }
     | undefined
   >();
-  const [fromUser, setFromUser] = useState<
-    | (User & {
-        conversations: (Conversation & {
-          messages: Message[];
-          users: (User & {
-            conversations: (Conversation & {
-              messages: Message[];
-              users: User[];
-            })[];
-            sessions: Session[];
-          })[];
-        })[];
-        sessions: Session[];
-      })
-    | undefined
-  >();
 
   const { data: session } = useSession();
   const { data: users, refetch: refetchUsers } = trpc.useQuery(["get-users"]);
@@ -83,10 +67,6 @@ export default function Chat() {
   useEffect(() => {
     if (session && session.user?.email) {
       setFromEmail(session.user.email);
-      // const fromUser = users?.users.find(
-      //   (u) => u.email === session?.user?.email
-      // );
-      // setFromUser(fromUser);
     }
     if (!session) {
       router.push("/");
@@ -103,7 +83,8 @@ export default function Chat() {
       />
       <div className="w-full flex justify-center items-end h-20">
         <h1 className="text-white">
-          welcome {fromUser?.name ? fromUser.name : session?.user?.email}
+          welcome{" "}
+          {profile?.profile?.name ? profile.profile.name : session?.user?.email}
         </h1>
       </div>
       <Conversations

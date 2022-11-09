@@ -143,7 +143,7 @@ export default function Conversations({
                   className="cursor-pointer p-2 hover:bg-gray-500 transition-all duration-300 ease-out"
                   onClick={() => {
                     setConversationId(c.id);
-                    setToUser(c.users.find((u) => u.email === fromEmail));
+                    setToUser(c.users.find((u) => u.email !== fromEmail));
                     setOpenMenu(false);
                   }}
                 >

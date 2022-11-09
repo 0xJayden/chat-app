@@ -47,6 +47,8 @@ export const appRouter = trpc
       fromEmail: z.string(),
       message: z.string(),
       convoId: z.number(),
+      time: z.number(),
+      amount: z.number(),
     }),
     async resolve({ input }) {
       const message = await prisma.message.create({
@@ -63,10 +65,31 @@ export const appRouter = trpc
         },
         data: {
           recentMessage: input.message,
+          recentSender: input.fromEmail,
+          timeOfRecentMessage: input.time,
+          read: false,
+        },
+      });
+
+      await prisma.user.update({
+        where: { email: input.fromEmail },
+        data: {
+          messagesSent: input.amount,
         },
       });
 
       return { success: true, message };
+    },
+  })
+  .mutation("read", {
+    input: z.object({
+      convoId: z.number(),
+    }),
+    async resolve({ input }) {
+      await prisma.conversation.update({
+        where: { id: input.convoId },
+        data: { read: true },
+      });
     },
   })
   .query("get-conversations", {
@@ -85,6 +108,8 @@ export const appRouter = trpc
             select: {
               id: true,
               recentMessage: true,
+              read: true,
+              recentSender: true,
               users: {
                 select: {
                   id: true,
@@ -200,20 +225,6 @@ export const appRouter = trpc
         where: { email: input.fromEmail },
         data: {
           name: input.name,
-        },
-      });
-    },
-  })
-  .mutation("add-1-to-messages", {
-    input: z.object({
-      fromEmail: z.string(),
-      amount: z.number(),
-    }),
-    async resolve({ input }) {
-      await prisma.user.update({
-        where: { email: input.fromEmail },
-        data: {
-          messagesSent: input.amount,
         },
       });
     },

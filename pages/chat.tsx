@@ -19,6 +19,7 @@ export default function Chat() {
   const [openHi, setOpenHi] = useState(false);
   const [popupCoins, setPopupCoins] = useState(false);
   const [popup, setPopup] = useState(false);
+  const [isOpened, setIsOpened] = useState(false);
   const [toUser, setToUser] = useState<
     | {
         id: string;
@@ -97,6 +98,8 @@ export default function Chat() {
         refetchConversations={refetchConversations}
         isLoading={isLoading}
         isSuccess={isSuccess}
+        setIsOpened={setIsOpened}
+        isOpened={isOpened}
       />
       <ConversationWindow
         session={session}
@@ -107,6 +110,8 @@ export default function Chat() {
         setOpenUsers={setOpenUsers}
         refetchUsers={refetchUsers}
         profile={profile}
+        setIsOpened={setIsOpened}
+        isOpened={isOpened}
       />
       <Users
         session={session}

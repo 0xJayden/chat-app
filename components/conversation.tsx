@@ -54,6 +54,8 @@ interface ConversationWindowInterface {
         } | null;
       }
     | undefined;
+  setIsOpened: Dispatch<SetStateAction<boolean>>;
+  isOpened: boolean;
 }
 
 export default function ConversationWindow({
@@ -65,6 +67,8 @@ export default function ConversationWindow({
   setOpenUsers,
   refetchUsers,
   profile,
+  setIsOpened,
+  isOpened,
 }: ConversationWindowInterface) {
   const [message, setMessage] = useState<string | null>(null);
   const [currentConversation, setCurrentConversation] = useState<
@@ -84,10 +88,17 @@ export default function ConversationWindow({
   const query = trpc.useQuery(["get-conversation", { convoId }], {
     onSuccess(data) {
       setCurrentConversation(data.conversation);
+      if (isOpened && !data.conversation?.recentSender) readMessage();
     },
-    refetchInterval: 1200,
+    refetchInterval: 2000,
     refetchOnWindowFocus: false,
   });
+
+  const read = trpc.useMutation(["read"]);
+
+  const readMessage = () => {
+    read.mutate({ convoId });
+  };
 
   const mutation = trpc.useMutation(["send-message"], {
     onSuccess() {
@@ -96,22 +107,23 @@ export default function ConversationWindow({
     },
   });
 
-  const addOneToMessage = trpc.useMutation(["add-1-to-messages"]);
-
   const sendMessage = async () => {
     if (!message || !session?.user || !fromEmail || !convoId || !profile)
       return;
 
-    mutation.mutate({ message, fromEmail, convoId });
+    const time = Date.now();
 
-    if (!profile.profile?.messagesSent) {
-      const amount = 1;
-      addOneToMessage.mutate({ fromEmail, amount });
+    const totalMessagesSent = profile.profile?.messagesSent;
+
+    let amount;
+
+    if (totalMessagesSent) {
+      amount = totalMessagesSent + 1;
     } else {
-      const amount = profile.profile.messagesSent + 1;
-
-      addOneToMessage.mutate({ fromEmail, amount });
+      amount = 1;
     }
+
+    mutation.mutate({ message, fromEmail, convoId, time, amount });
 
     setMessage(null);
   };
@@ -128,7 +140,7 @@ export default function ConversationWindow({
         setOpenMenu(false);
         setOpenUsers(false);
       }}
-      className="flex flex-col pt-5 px-5 items-center justify-between relative"
+      className="flex flex-col pt-5 px-5 min-h-[550px] items-center justify-between relative"
     >
       {toUser?.email && (
         <div className="text-white flex justify-center fixed top-10 bg-gray-700 p-2 w-full">

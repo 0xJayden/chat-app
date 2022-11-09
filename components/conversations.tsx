@@ -29,6 +29,8 @@ interface ConversationsInterface {
     | {
         conversations: {
           recentMessage: string | null;
+          recentSender: string | null;
+          read: boolean | null;
           users: {
             id: string;
             email: string | null;
@@ -56,6 +58,8 @@ interface ConversationsInterface {
   >;
   isLoading: boolean;
   isSuccess: boolean;
+  setIsOpened: Dispatch<SetStateAction<boolean>>;
+  isOpened: boolean;
 }
 
 export default function Conversations({
@@ -68,6 +72,8 @@ export default function Conversations({
   refetchConversations,
   isLoading,
   isSuccess,
+  setIsOpened,
+  isOpened,
 }: ConversationsInterface) {
   const [openDeleteConvo, setOpenDeleteConvo] = useState(false);
   const [convoId, setConvoId] = useState<number>();
@@ -131,18 +137,27 @@ export default function Conversations({
           <div className="flex flex-col w-full overflow-scroll">
             {conversations?.conversations.map((c) => (
               <div className="border-b border-gray-500" key={c.id}>
-                <XMarkIcon
-                  onClick={() => {
-                    setConvoId(c.id);
-                    setOpenDeleteConvo(true);
-                  }}
-                  height="15px"
-                  className="cursor-pointer rounded-full mx-2 mt-2 hover:bg-red-500"
-                />
+                <div className="flex justify-between">
+                  <XMarkIcon
+                    onClick={() => {
+                      setConvoId(c.id);
+                      setOpenDeleteConvo(true);
+                    }}
+                    height="15px"
+                    className="cursor-pointer rounded-full mx-2 mt-2 hover:bg-red-500"
+                  />
+                  {c.read ? (
+                    <p className="m-2 h-3 w-3 rounded-full bg-green-500"></p>
+                  ) : (
+                    <p className="m-2 h-3 w-3 rounded-full bg-red-500"></p>
+                  )}
+                </div>
+
                 <div
                   className="cursor-pointer p-2 hover:bg-gray-500 transition-all duration-300 ease-out"
                   onClick={() => {
                     setConversationId(c.id);
+                    setIsOpened(true);
                     setToUser(c.users.find((u) => u.email !== fromEmail));
                     setOpenMenu(false);
                   }}

@@ -47,7 +47,7 @@ export const appRouter = trpc
       fromEmail: z.string(),
       message: z.string(),
       convoId: z.number(),
-      time: z.number(),
+      time: z.string(),
       amount: z.number(),
     }),
     async resolve({ input }) {
@@ -110,6 +110,7 @@ export const appRouter = trpc
               recentMessage: true,
               read: true,
               recentSender: true,
+              timeOfRecentMessage: true,
               users: {
                 select: {
                   id: true,

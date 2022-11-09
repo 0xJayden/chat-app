@@ -111,7 +111,7 @@ export default function ConversationWindow({
     if (!message || !session?.user || !fromEmail || !convoId || !profile)
       return;
 
-    const time = Date.now();
+    const time = Date.now().toString();
 
     const totalMessagesSent = profile.profile?.messagesSent;
 

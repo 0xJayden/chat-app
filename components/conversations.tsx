@@ -30,6 +30,7 @@ interface ConversationsInterface {
         conversations: {
           recentMessage: string | null;
           recentSender: string | null;
+          timeOfRecentMessage: string | null;
           read: boolean | null;
           users: {
             id: string;
@@ -137,20 +138,21 @@ export default function Conversations({
           <div className="flex flex-col w-full overflow-scroll">
             {conversations?.conversations.map((c) => (
               <div className="border-b border-gray-500" key={c.id}>
-                <div className="flex justify-between">
+                <div className="flex justify-between items-center">
                   <XMarkIcon
                     onClick={() => {
                       setConvoId(c.id);
                       setOpenDeleteConvo(true);
                     }}
                     height="15px"
-                    className="cursor-pointer rounded-full mx-2 mt-2 hover:bg-red-500"
+                    className="cursor-pointer rounded-full mx-2 hover:bg-red-500"
                   />
-                  {c.read ? (
-                    <p className="m-2 h-3 w-3 rounded-full bg-green-500"></p>
-                  ) : (
-                    <p className="m-2 h-3 w-3 rounded-full bg-red-500"></p>
-                  )}
+                  <div className="mr-2">
+                    <p className="text-sm">{c.timeOfRecentMessage}</p>
+                    {!c.read && !c.recentSender ? (
+                      <p className="h-3 w-3 rounded-full bg-green-500"></p>
+                    ) : null}
+                  </div>
                 </div>
 
                 <div

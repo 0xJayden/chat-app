@@ -374,9 +374,7 @@ export default function Users({
         >
           <div className="h-6 w-6 overflow-hidden rounded-full mr-2">
             {!profile?.profile?.image ? (
-              <p>
-                <UserCircleIcon className="h-6" />
-              </p>
+              <UserCircleIcon className="h-6" />
             ) : (
               <img src={profile.profile.image} />
             )}
@@ -398,7 +396,7 @@ export default function Users({
                   className="cursor-pointer border-b border-gray-500 w-full hover:bg-gray-500 transition-all duration-300 ease-out"
                   key={u.email}
                 >
-                  <p
+                  <div
                     className="p-2 flex"
                     onClick={() => {
                       if (!u) return;
@@ -413,7 +411,7 @@ export default function Users({
                       <UserCircleIcon className="h-6" />
                     )}
                     <p className="ml-2">{u.name ? u.name : u.email}</p>
-                  </p>
+                  </div>
                 </div>
               )
           )}
@@ -428,7 +426,7 @@ export default function Users({
                   className="cursor-pointer border-b border-gray-500 w-full"
                   key={u.email}
                 >
-                  <p
+                  <div
                     className="p-2 flex"
                     onClick={() => {
                       if (!u) return;
@@ -443,7 +441,7 @@ export default function Users({
                       <UserCircleIcon className="h-6" />
                     )}
                     {u.name ? u.name : u.email}
-                  </p>
+                  </div>
                 </div>
               )
           )}

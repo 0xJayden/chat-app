@@ -128,7 +128,7 @@ export default function ConversationWindow({
         setOpenMenu(false);
         setOpenUsers(false);
       }}
-      className="flex flex-col pt-5 mt-10 px-5 items-center justify-between relative"
+      className="flex flex-col pt-5 px-5 items-center justify-between relative"
     >
       {toUser?.email && (
         <div className="text-white flex justify-center fixed top-10 bg-gray-700 p-2 w-full">

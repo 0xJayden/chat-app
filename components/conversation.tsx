@@ -88,10 +88,10 @@ export default function ConversationWindow({
   const query = trpc.useQuery(["get-conversation", { convoId }], {
     onSuccess(data) {
       setCurrentConversation(data.conversation);
-      if (isOpened && !data.conversation?.recentSender) readMessage();
+      if (isOpened && data.conversation?.recentSender !== fromEmail)
+        readMessage();
     },
     refetchInterval: 2000,
-    refetchOnWindowFocus: false,
   });
 
   const read = trpc.useMutation(["read"]);

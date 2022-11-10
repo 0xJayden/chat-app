@@ -46,9 +46,7 @@ export default function Chat() {
     onError(err) {
       console.log(err, "err");
     },
-    refetchInterval: false,
-    refetchOnReconnect: false,
-    refetchOnWindowFocus: false,
+    refetchInterval: 3000,
   });
 
   const callRefetchUsers = async () => {

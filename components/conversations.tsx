@@ -138,18 +138,18 @@ export default function Conversations({
           <div className="flex flex-col w-full overflow-scroll">
             {conversations?.conversations.map((c) => (
               <div className="border-b border-gray-500" key={c.id}>
-                <div className="flex justify-between items-center">
+                <div className="flex mx-2 mt-2 justify-between items-center">
                   <XMarkIcon
                     onClick={() => {
                       setConvoId(c.id);
                       setOpenDeleteConvo(true);
                     }}
                     height="15px"
-                    className="cursor-pointer rounded-full mx-2 hover:bg-red-500"
+                    className="cursor-pointer rounded-full hover:bg-red-500"
                   />
-                  <div className="mr-2">
-                    <p className="text-sm">{c.timeOfRecentMessage}</p>
-                    {!c.read && !c.recentSender ? (
+                  <div className="flex items-center">
+                    <p className="text-sm mr-2">{c.timeOfRecentMessage}</p>
+                    {!c.read && c.recentSender !== fromEmail ? (
                       <p className="h-3 w-3 rounded-full bg-green-500"></p>
                     ) : null}
                   </div>

@@ -70,11 +70,12 @@ export default function Chat() {
       ) : (
         <p className="p-2 m-5 border border-gray-400 rounded">
           Create a conversation with a user by opening the{" "}
-          <span className="font-normal">'User Menu'</span> on the right and
-          selecting a user.<br></br>
+          <span className="font-normal">{`\'User Menu\'`}</span> on the right
+          and selecting a user.<br></br>
           <div className="w-full text-center italic">or</div>
           Select an exisiting conversation by opening the{" "}
-          <span className="font-normal">'Conversation Menu'</span> on the left.
+          <span className="font-normal">{`\'Conversation Menu\'`}</span> on the
+          left.
         </p>
       )}
       <Users

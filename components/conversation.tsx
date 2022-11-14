@@ -61,6 +61,10 @@ export default function ConversationWindow({
     onSuccess: () => {
       query.refetch();
       refetchProfile();
+      console.log(
+        query.data?.conversation?.read,
+        query.data?.conversation?.recentSender
+      );
     },
   });
 

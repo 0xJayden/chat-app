@@ -18,8 +18,12 @@ export const options: NextAuthOptions = {
       from: process.env.EMAIL_FROM,
     }),
     GoogleProvider({
-      clientId: "",
-      clientSecret: "",
+      clientId: process.env.GOOGLE_CLIENT_ID
+        ? process.env.GOOGLE_CLIENT_ID
+        : "",
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET
+        ? process.env.GOOGLE_CLIENT_SECRET
+        : "",
     }),
   ],
   adapter: PrismaAdapter(prisma),

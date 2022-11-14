@@ -61,9 +61,9 @@ export default function Conversations({
       {openDeleteConvo && (
         <div className="fixed flex inset-0 justify-center items-center z-20 backdrop-brightness-75">
           <div className="flex flex-col justify-between text-center border border-gray-500 rounded h-[150px] w-[250px] p-2 bg-gray-700">
-            <p className="text-gray-300">
+            <h1 className="text-gray-300">
               Are you sure you want to remove the conversation?
-            </p>
+            </h1>
             <div className="flex justify-between px-4">
               <button
                 onClick={() => setOpenDeleteConvo(false)}
@@ -111,13 +111,13 @@ export default function Conversations({
                       className="cursor-pointer rounded-full hover:bg-red-500"
                     />
                     <div className="flex items-center">
-                      <p className="text-sm">
+                      <div className="text-sm">
                         {c.timeOfRecentMessage ? (
                           <Moment fromNow>{c.timeOfRecentMessage}</Moment>
                         ) : null}
-                      </p>
+                      </div>
                       {!c.read && c.recentSender !== fromEmail ? (
-                        <p className="h-3 w-3 rounded-full bg-green-500"></p>
+                        <div className="h-3 w-3 rounded-full bg-green-500"></div>
                       ) : null}
                     </div>
                   </div>
@@ -146,7 +146,7 @@ export default function Conversations({
                         setOpenMenu(false);
                       }}
                     >
-                      <p>
+                      <>
                         {c.users.length > 1 ? (
                           c.users.map((u) =>
                             u.email !== fromEmail ? (
@@ -156,7 +156,7 @@ export default function Conversations({
                         ) : (
                           <p>No users left</p>
                         )}
-                      </p>
+                      </>
                       <p className="text-gray-400 line-clamp-2 text-ellipsis text-sm">
                         {c.recentMessage
                           ? c.recentMessage

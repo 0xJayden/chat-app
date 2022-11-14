@@ -355,7 +355,13 @@ export default function Users({
               {!profile?.profile?.image ? (
                 <UserCircleIcon className="h-6" />
               ) : (
-                <img src={profile.profile.image} />
+                <>
+                  {profile.profile.image.indexOf("https") === 0 ? (
+                    <img src={`${profile.profile.image}`} />
+                  ) : (
+                    <img src={profile.profile.image} />
+                  )}
+                </>
               )}
             </div>
             <p>{profile?.profile?.name ? profile.profile.name : fromEmail}</p>

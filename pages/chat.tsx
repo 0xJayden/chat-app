@@ -68,7 +68,7 @@ export default function Chat() {
           fromEmail={fromEmail}
         />
       ) : (
-        <p className="p-2 m-5 border border-gray-400 rounded">
+        <div className="p-2 m-5 border border-gray-400 rounded">
           Create a conversation with a user by opening the{" "}
           <span className="font-normal">{`'User Menu'`}</span> on the right and
           selecting a user.<br></br>
@@ -76,7 +76,7 @@ export default function Chat() {
           Select an exisiting conversation by opening the{" "}
           <span className="font-normal">{`'Conversation Menu'`}</span> on the
           left.
-        </p>
+        </div>
       )}
       <Users
         setToUser={setToUser}

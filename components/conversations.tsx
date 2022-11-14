@@ -117,7 +117,7 @@ export default function Conversations({
                   <div className="flex items-center">
                     {c.users.map((u) =>
                       u.email !== fromEmail ? (
-                        <div>
+                        <div key={u.id}>
                           {u.image ? (
                             <div className="flex h-10 w-10 overflow-hidden rounded-full">
                               <div className="">

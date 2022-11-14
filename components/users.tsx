@@ -114,7 +114,15 @@ UsersInterface) {
 
     if (
       existingUserInConvo &&
-      existingUserInConvo.users.find((u) => u.email === profile?.profile?.email)
+      existingUserInConvo.users.find(
+        (u: {
+          id: string;
+          email: string | null;
+          name: string | null;
+          image: string | null;
+          sessions: Session[];
+        }) => u.email === profile?.profile?.email
+      )
     ) {
       setOpenUsers(false);
       return;
@@ -125,7 +133,6 @@ UsersInterface) {
       {
         onSuccess(data: { success: boolean; conversation: Conversation }) {
           setConversationId(data.conversation.id);
-          // setIsOpen(true);
         },
       }
     );

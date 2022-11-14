@@ -95,8 +95,21 @@ UsersInterface) {
 
     if (!fromUserId) return;
 
-    const existingUserInConvo = conversations?.conversations.find((c) =>
-      c.users.find((u) => u.email === user.email)
+    const existingUserInConvo = conversations?.conversations.find(
+      (c: {
+        recentMessage: string | null;
+        recentSender: string | null;
+        timeOfRecentMessage: string | null;
+        read: boolean | null;
+        users: {
+          id: string;
+          email: string | null;
+          name: string | null;
+          image: string | null;
+          sessions: Session[];
+        }[];
+        id: number;
+      }) => c.users.find((u) => u.email === user.email)
     );
 
     if (

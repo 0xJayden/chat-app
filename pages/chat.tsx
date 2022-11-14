@@ -51,7 +51,7 @@ export default function Chat() {
       />
       <div className="w-full flex justify-center items-end h-20">
         <h1 className="text-white">
-          welcome {profile?.profile?.name ? profile.profile.name : fromEmail}
+          Welcome {profile?.profile?.name ? profile.profile.name : fromEmail}!
         </h1>
       </div>
       <Conversations
@@ -61,12 +61,21 @@ export default function Chat() {
         setToUser={setToUser}
         setOpenMenu={setOpenMenu}
       />
-      {convoId !== 0 && (
+      {convoId !== 0 ? (
         <ConversationWindow
           toUser={toUser}
           convoId={convoId}
           fromEmail={fromEmail}
         />
+      ) : (
+        <p className="p-2 m-5 border border-gray-400 rounded">
+          Create a conversation with a user by opening the{" "}
+          <span className="font-normal">'User Menu'</span> on the right and
+          selecting a user.<br></br>
+          <div className="w-full text-center italic">or</div>
+          Select an exisiting conversation by opening the{" "}
+          <span className="font-normal">'Conversation Menu'</span> on the left.
+        </p>
       )}
       <Users
         setToUser={setToUser}

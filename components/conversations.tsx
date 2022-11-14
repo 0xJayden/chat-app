@@ -75,6 +75,7 @@ export default function Conversations({
                 onClick={() => {
                   if (!convoId) return;
                   removeSelfFromConvo(convoId);
+                  setOpenDeleteConvo(false);
                 }}
                 className="border border-gray-500 rounded py-2 px-4 bg-gray-200 text-gray-700"
               >
@@ -138,7 +139,7 @@ export default function Conversations({
                     )}
 
                     <div
-                      className="cursor-pointer p-2 hover:bg-gray-500 transition-all duration-300 ease-out"
+                      className="cursor-pointer p-2 w-full hover:bg-gray-500 transition-all duration-300 ease-out"
                       onClick={() => {
                         setConversationId(c.id);
                         setToUser(c.users.find((u) => u.email !== fromEmail));
@@ -146,7 +147,7 @@ export default function Conversations({
                       }}
                     >
                       <p>
-                        {c.users.length > 0 ? (
+                        {c.users.length > 1 ? (
                           c.users.map((u) =>
                             u.email !== fromEmail ? (
                               <div key={u.id}>{u.name ? u.name : u.email}</div>

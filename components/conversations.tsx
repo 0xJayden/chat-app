@@ -91,7 +91,7 @@ export default function Conversations({
             : "opacity-0 -translate-x-full transition duration-500 ease-out"
         }`}
       >
-        <div className="flex flex-col h-full border-r border-gray-500 bg-gray-700">
+        <div className="flex flex-col h-full min-w-[200px] border-r border-gray-500 bg-gray-700">
           <h1 className="p-2 text-lg font-normal">
             {conversations?.conversations.length} Conversations
           </h1>
@@ -146,9 +146,15 @@ export default function Conversations({
                       }}
                     >
                       <p>
-                        {c.users.find((u) => u.email !== fromEmail)
-                          ? c.users.find((u) => u.email !== fromEmail)?.email
-                          : `No Users Left`}
+                        {c.users.length > 0 ? (
+                          c.users.map((u) =>
+                            u.email !== fromEmail ? (
+                              <div key={u.id}>{u.name ? u.name : u.email}</div>
+                            ) : null
+                          )
+                        ) : (
+                          <p>No users left</p>
+                        )}
                       </p>
                       <p className="text-gray-400 line-clamp-2 text-ellipsis text-sm">
                         {c.recentMessage

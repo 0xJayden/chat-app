@@ -344,7 +344,7 @@ export default function Users({
           }}
           className="h-full w-full"
         ></div>
-        <div className="flex flex-col h-full border-l border-gray-500 bg-gray-700">
+        <div className="flex flex-col h-full min-w-[250px] border-l border-gray-500 bg-gray-700">
           <h1 className="text-lg font-normal p-2">Account</h1>
 
           <div

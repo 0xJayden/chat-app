@@ -49,6 +49,7 @@ export const appRouter = trpc
       convoId: z.number(),
       time: z.string(),
       amount: z.number(),
+      read: z.boolean(),
     }),
     async resolve({ input }) {
       const message = await prisma.message.create({
@@ -67,7 +68,7 @@ export const appRouter = trpc
           recentMessage: input.message,
           recentSender: input.fromEmail,
           timeOfRecentMessage: input.time,
-          read: false,
+          read: input.read,
         },
       });
 

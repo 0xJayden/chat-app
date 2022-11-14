@@ -81,7 +81,9 @@ export default function ConversationWindow({
       amount = 1;
     }
 
-    mutation.mutate({ message, fromEmail, convoId, time, amount });
+    const read = false;
+
+    mutation.mutate({ message, fromEmail, convoId, time, amount, read });
 
     setMessage(null);
   };

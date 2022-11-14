@@ -47,9 +47,7 @@ export const appRouter = trpc
       fromEmail: z.string(),
       message: z.string(),
       convoId: z.number(),
-      time: z.date(),
       amount: z.number(),
-      read: z.boolean(),
     }),
     async resolve({ input }) {
       const message = await prisma.message.create({
@@ -67,8 +65,8 @@ export const appRouter = trpc
         data: {
           recentMessage: input.message,
           recentSender: input.fromEmail,
-          timeOfRecentMessage: input.time,
-          read: input.read,
+          timeOfRecentMessage: new Date(),
+          read: false,
         },
       });
 
@@ -122,23 +120,6 @@ export const appRouter = trpc
             },
           },
         },
-        // include: {
-        //   conversations: {
-        //     include: {
-        //       messages: true,
-        //       users: {
-        //         include: {
-        //           conversations: {
-        //             include: {
-        //               messages: true,
-        //               users: true,
-        //             },
-        //           },
-        //         },
-        //       },
-        //     },
-        //   },
-        // },
       });
 
       if (!user) return;
@@ -160,15 +141,6 @@ export const appRouter = trpc
           image: true,
           sessions: true,
         },
-        // include: {
-        //   sessions: true,
-        //   conversations: {
-        //     include: {
-        //       messages: true,
-        //       users: true,
-        //     },
-        //   },
-        // },
       });
       return {
         users,

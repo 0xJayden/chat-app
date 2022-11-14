@@ -66,8 +66,6 @@ export default function Chat() {
           toUser={toUser}
           convoId={convoId}
           fromEmail={fromEmail}
-          setOpenMenu={setOpenMenu}
-          setOpenUsers={setOpenUsers}
         />
       )}
       <Users

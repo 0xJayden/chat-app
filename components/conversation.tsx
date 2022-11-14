@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { trpc } from "../utils/trpc";
 import { User, Conversation, Session, Message } from "@prisma/client";
 import { ArrowUpIcon, UserCircleIcon } from "@heroicons/react/24/outline";
@@ -16,16 +16,12 @@ interface ConversationWindowInterface {
 
   convoId: number;
   fromEmail: string;
-  setOpenMenu: Dispatch<SetStateAction<boolean>>;
-  setOpenUsers: Dispatch<SetStateAction<boolean>>;
 }
 
 export default function ConversationWindow({
   toUser,
   convoId,
   fromEmail,
-  setOpenMenu,
-  setOpenUsers,
 }: ConversationWindowInterface) {
   const [message, setMessage] = useState<string | null>(null);
   const [currentConversation, setCurrentConversation] = useState<
@@ -71,8 +67,6 @@ export default function ConversationWindow({
   const sendMessage = async () => {
     if (!message || !fromEmail || !convoId || !profile) return;
 
-    const time = new Date();
-
     const totalMessagesSent = profile.profile?.messagesSent;
 
     let amount;
@@ -83,9 +77,7 @@ export default function ConversationWindow({
       amount = 1;
     }
 
-    const read = false;
-
-    mutation.mutate({ message, fromEmail, convoId, time, amount, read });
+    mutation.mutate({ message, fromEmail, convoId, amount });
 
     setMessage(null);
   };

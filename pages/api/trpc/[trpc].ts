@@ -102,8 +102,6 @@ export const appRouter = trpc
           email: input.fromEmail,
         },
         select: {
-          name: true,
-          email: true,
           conversations: {
             select: {
               id: true,
@@ -116,6 +114,7 @@ export const appRouter = trpc
                   id: true,
                   email: true,
                   name: true,
+                  image: true,
                   sessions: true,
                 },
               },

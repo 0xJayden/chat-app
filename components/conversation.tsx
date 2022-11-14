@@ -1,17 +1,9 @@
-import { NextSession } from "../utils/utils";
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import { trpc } from "../utils/trpc";
 import { User, Conversation, Session, Message } from "@prisma/client";
 import { ArrowUpIcon, UserCircleIcon } from "@heroicons/react/24/outline";
-import {
-  QueryObserverResult,
-  RefetchOptions,
-  RefetchQueryFilters,
-} from "react-query";
-import { TRPCClientErrorLike } from "@trpc/client";
 
 interface ConversationWindowInterface {
-  session: NextSession | null;
   toUser:
     | {
         id: string;
@@ -25,50 +17,14 @@ interface ConversationWindowInterface {
   fromEmail: string;
   setOpenMenu: Dispatch<SetStateAction<boolean>>;
   setOpenUsers: Dispatch<SetStateAction<boolean>>;
-  refetchUsers: <TPageData>(
-    options?: (RefetchOptions & RefetchQueryFilters<TPageData>) | undefined
-  ) => Promise<
-    QueryObserverResult<
-      {
-        users: {
-          id: string;
-          email: string | null;
-          name: string | null;
-          sessions: Session[];
-        }[];
-      },
-      TRPCClientErrorLike<any>
-    >
-  >;
-  profile:
-    | {
-        profile: {
-          id: string;
-          email: string | null;
-          name: string | null;
-          sessions: Session[];
-          image: string | null;
-          coins: number | null;
-          messagesSent: number | null;
-          age: number | null;
-        } | null;
-      }
-    | undefined;
-  setIsOpened: Dispatch<SetStateAction<boolean>>;
-  isOpened: boolean;
 }
 
 export default function ConversationWindow({
-  session,
   toUser,
   convoId,
   fromEmail,
   setOpenMenu,
   setOpenUsers,
-  refetchUsers,
-  profile,
-  setIsOpened,
-  isOpened,
 }: ConversationWindowInterface) {
   const [message, setMessage] = useState<string | null>(null);
   const [currentConversation, setCurrentConversation] = useState<
@@ -88,11 +44,14 @@ export default function ConversationWindow({
   const query = trpc.useQuery(["get-conversation", { convoId }], {
     onSuccess(data) {
       setCurrentConversation(data.conversation);
-      if (isOpened && data.conversation?.recentSender !== fromEmail)
-        readMessage();
+      if (data.conversation?.recentSender !== fromEmail) readMessage();
     },
     refetchInterval: 2000,
   });
+  const { data: profile, refetch: refetchProfile } = trpc.useQuery([
+    "get-profile",
+    { fromEmail },
+  ]);
 
   const read = trpc.useMutation(["read"]);
 
@@ -101,15 +60,14 @@ export default function ConversationWindow({
   };
 
   const mutation = trpc.useMutation(["send-message"], {
-    onSuccess() {
+    onSuccess: () => {
       query.refetch();
-      refetchUsers();
+      refetchProfile();
     },
   });
 
   const sendMessage = async () => {
-    if (!message || !session?.user || !fromEmail || !convoId || !profile)
-      return;
+    if (!message || !fromEmail || !convoId || !profile) return;
 
     const time = Date.now().toString();
 
@@ -135,13 +93,7 @@ export default function ConversationWindow({
   useEffect(scrollToBottom, [currentConversation]);
 
   return (
-    <div
-      onClick={() => {
-        setOpenMenu(false);
-        setOpenUsers(false);
-      }}
-      className="flex flex-col pt-5 px-5 min-h-[550px] items-center justify-between relative"
-    >
+    <div className="flex flex-col pt-5 px-5 min-h-[550px] items-center justify-between relative">
       {toUser?.email && (
         <div className="text-white flex justify-center fixed top-10 bg-gray-700 p-2 w-full">
           {/* <div className="h-6 w-6 mr-2 overflow-hidden rounded-full">

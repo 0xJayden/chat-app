@@ -5,7 +5,7 @@ import ConversationWindow from "../components/conversation";
 import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
 import { trpc } from "../utils/trpc";
-import { User, Conversation, Session, Message } from "@prisma/client";
+import { Session } from "@prisma/client";
 import { useRouter } from "next/router";
 import Navbar from "../components/navbar";
 
@@ -19,7 +19,6 @@ export default function Chat() {
   const [openHi, setOpenHi] = useState(false);
   const [popupCoins, setPopupCoins] = useState(false);
   const [popup, setPopup] = useState(false);
-  const [isOpened, setIsOpened] = useState(false);
   const [toUser, setToUser] = useState<
     | {
         id: string;
@@ -31,37 +30,7 @@ export default function Chat() {
   >();
 
   const { data: session } = useSession();
-  const { data: users, refetch: refetchUsers } = trpc.useQuery(["get-users"]);
-  const { data: profile, refetch: refetchProfile } = trpc.useQuery([
-    "get-profile",
-    { fromEmail },
-  ]);
-
-  const {
-    data: conversations,
-    isSuccess,
-    isLoading,
-    refetch: refetchConversations,
-  } = trpc.useQuery(["get-conversations", { fromEmail }], {
-    onError(err) {
-      console.log(err, "err");
-    },
-    refetchInterval: 3000,
-  });
-
-  const callRefetchUsers = async () => {
-    await refetchUsers();
-    setOpenHi(true);
-    setPopup(true);
-    setTimeout(() => setOpenHi(false), 3000);
-  };
-
-  const callRefetchUsersCoins = async () => {
-    await refetchUsers();
-    setPopupCoins(true);
-    setTimeout(() => setPopupCoins(false), 3000);
-    setTimeout(() => setPopup(false), 3000);
-  };
+  const { data: profile } = trpc.useQuery(["get-profile", { fromEmail }]);
 
   useEffect(() => {
     if (session && session.user?.email) {
@@ -70,7 +39,7 @@ export default function Chat() {
     if (!session) {
       router.push("/");
     }
-  }, [users]);
+  }, [session]);
 
   return (
     <Layout>
@@ -82,8 +51,7 @@ export default function Chat() {
       />
       <div className="w-full flex justify-center items-end h-20">
         <h1 className="text-white">
-          welcome{" "}
-          {profile?.profile?.name ? profile.profile.name : session?.user?.email}
+          welcome {profile?.profile?.name ? profile.profile.name : fromEmail}
         </h1>
       </div>
       <Conversations
@@ -92,41 +60,28 @@ export default function Chat() {
         setConversationId={setConversationId}
         setToUser={setToUser}
         setOpenMenu={setOpenMenu}
-        conversations={conversations}
-        refetchConversations={refetchConversations}
-        isLoading={isLoading}
-        isSuccess={isSuccess}
-        setIsOpened={setIsOpened}
-        isOpened={isOpened}
       />
-      <ConversationWindow
-        session={session}
-        toUser={toUser}
-        convoId={convoId}
-        fromEmail={fromEmail}
-        setOpenMenu={setOpenMenu}
-        setOpenUsers={setOpenUsers}
-        refetchUsers={refetchUsers}
-        profile={profile}
-        setIsOpened={setIsOpened}
-        isOpened={isOpened}
-      />
+      {convoId !== 0 && (
+        <ConversationWindow
+          toUser={toUser}
+          convoId={convoId}
+          fromEmail={fromEmail}
+          setOpenMenu={setOpenMenu}
+          setOpenUsers={setOpenUsers}
+        />
+      )}
       <Users
-        session={session}
-        users={users}
         setToUser={setToUser}
         openUsers={openUsers}
         setOpenUsers={setOpenUsers}
         setConversationId={setConversationId}
-        callRefetchUsers={callRefetchUsers}
         fromEmail={fromEmail}
         openHi={openHi}
-        callRefetchUsersCoins={callRefetchUsersCoins}
         popupCoins={popupCoins}
         popup={popup}
-        refetchProfile={refetchProfile}
-        conversations={conversations}
-        profile={profile}
+        setOpenHi={setOpenHi}
+        setPopup={setPopup}
+        setPopupCoins={setPopupCoins}
       />
     </Layout>
   );

@@ -1,4 +1,3 @@
-import { NextSession } from "../utils/utils";
 import {
   BaseSyntheticEvent,
   Dispatch,
@@ -13,26 +12,7 @@ import {
   UserIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
-import internal from "stream";
-import {
-  QueryObserverResult,
-  RefetchOptions,
-  RefetchQueryFilters,
-} from "react-query";
-import { TRPCClientErrorLike } from "@trpc/client";
 interface UsersInterface {
-  session: NextSession | null;
-  users:
-    | {
-        users: {
-          id: string;
-          email: string | null;
-          name: string | null;
-          image: string | null;
-          sessions: Session[];
-        }[];
-      }
-    | undefined;
   setToUser: Dispatch<
     SetStateAction<
       | {
@@ -47,81 +27,50 @@ interface UsersInterface {
   openUsers: boolean;
   setOpenUsers: Dispatch<SetStateAction<boolean>>;
   setConversationId: Dispatch<SetStateAction<number>>;
-  callRefetchUsers: () => void;
   fromEmail: string;
   openHi: boolean;
-  callRefetchUsersCoins: () => void;
   popupCoins: boolean;
   popup: boolean;
-  refetchProfile: <TPageData>(
-    options?: (RefetchOptions & RefetchQueryFilters<TPageData>) | undefined
-  ) => Promise<
-    QueryObserverResult<
-      {
-        profile: {
-          id: string;
-          email: string | null;
-          name: string | null;
-          sessions: Session[];
-          image: string | null;
-          coins: number | null;
-          messagesSent: number | null;
-          age: number | null;
-        } | null;
-      },
-      TRPCClientErrorLike<any>
-    >
-  >;
-  conversations:
-    | {
-        conversations: {
-          recentMessage: string | null;
-          users: {
-            email: string | null;
-            name: string | null;
-          }[];
-          id: number;
-        }[];
-      }
-    | undefined;
-  profile:
-    | {
-        profile: {
-          id: string;
-          email: string | null;
-          name: string | null;
-          sessions: Session[];
-          image: string | null;
-          coins: number | null;
-          messagesSent: number | null;
-          age: number | null;
-        } | null;
-      }
-    | undefined;
+  setOpenHi: Dispatch<SetStateAction<boolean>>;
+  setPopup: Dispatch<SetStateAction<boolean>>;
+  setPopupCoins: Dispatch<SetStateAction<boolean>>;
+  // setIsOpen: Dispatch<SetStateAction<boolean>>;
 }
 
 export default function Users({
-  session,
-  users,
   setToUser,
   openUsers,
   setOpenUsers,
   setConversationId,
-  callRefetchUsers,
   fromEmail,
   openHi,
-  callRefetchUsersCoins,
   popupCoins,
   popup,
-  refetchProfile,
-  conversations,
-  profile,
-}: UsersInterface) {
+  setOpenHi,
+  setPopup,
+  setPopupCoins,
+}: // setIsOpen,
+UsersInterface) {
   const [openProfile, setOpenProfile] = useState(false);
   const [name, setName] = useState("");
   const [pfp, setPfp] = useState<string>();
 
   const imageInputRef = useRef<HTMLInputElement>(null);
+
+  const { data: users } = trpc.useQuery(["get-users"]);
+  const { data: profile, refetch: refetchProfile } = trpc.useQuery([
+    "get-profile",
+    { fromEmail },
+  ]);
+  const { data: conversations } = trpc.useQuery(
+    ["get-conversations", { fromEmail }],
+    {
+      onError(err) {
+        console.log(err, "err");
+      },
+      refetchInterval: 3000,
+    }
+  );
 
   const mutation = trpc.useMutation(["create-conversation"]);
   const setNameMutation = trpc.useMutation(["set-name"]);
@@ -138,22 +87,13 @@ export default function Users({
         }
       | undefined
   ) => {
-    if (!user || user.email === session?.user?.email) return;
+    if (!user || user.email === fromEmail) return;
     setToUser(user);
 
     const toUserId = user.id;
     const fromUserId = profile?.profile?.id;
 
     if (!fromUserId) return;
-
-    // const fromUser = users?.users.find((u) => u.email === session?.user?.email);
-    // setFromUser(fromUser);
-    // if (!fromUser) return;
-
-    // const fromUserId = fromUser.id;
-
-    // console.log("to", user);
-    // console.log("from", fromUser);
 
     const existingUserInConvo = conversations?.conversations.find((c) =>
       c.users.find((u) => u.email === user.email)
@@ -172,6 +112,7 @@ export default function Users({
       {
         onSuccess(data: { success: boolean; conversation: Conversation }) {
           setConversationId(data.conversation.id);
+          // setIsOpen(true);
         },
       }
     );
@@ -182,8 +123,11 @@ export default function Users({
     setNameMutation.mutate(
       { fromEmail, name },
       {
-        onSuccess() {
-          callRefetchUsers();
+        onSuccess: async () => {
+          await refetchProfile();
+          setOpenHi(true);
+          setPopup(true);
+          setTimeout(() => setOpenHi(false), 3000);
           setName("");
         },
       }
@@ -198,8 +142,11 @@ export default function Users({
           amount,
         },
         {
-          onSuccess() {
-            callRefetchUsersCoins();
+          onSuccess: async () => {
+            await refetchProfile();
+            setPopupCoins(true);
+            setTimeout(() => setPopupCoins(false), 3000);
+            setTimeout(() => setPopup(false), 3000);
           },
         }
       );
@@ -212,8 +159,11 @@ export default function Users({
           amount,
         },
         {
-          onSuccess() {
-            callRefetchUsersCoins();
+          onSuccess: async () => {
+            await refetchProfile();
+            setPopupCoins(true);
+            setTimeout(() => setPopupCoins(false), 3000);
+            setTimeout(() => setPopup(false), 3000);
           },
         }
       );
@@ -244,8 +194,8 @@ export default function Users({
       addPfp.mutate(
         { fromEmail, image },
         {
-          onSuccess() {
-            refetchProfile();
+          onSuccess: async () => {
+            await refetchProfile();
           },
         }
       );
@@ -360,92 +310,94 @@ export default function Users({
         </div>
       )}
       <div
-        className={`flex flex-col fixed right-0 z-10 top-10 items-center py-5 border-l border-gray-500 h-full bg-gray-700 ${
+        className={`fixed top-10 inset-0 flex justify-start z-10 items-center ${
           openUsers
             ? "opacity-100 transition duration-500 ease-out"
             : "opacity-0 translate-x-full transition duration-500 ease-out"
         }`}
       >
-        <h1 className="text-lg font-normal">Account</h1>
-
         <div
-          onClick={() => setOpenProfile(true)}
-          className="flex w-full text-center p-2 border-b border-gray-500 cursor-pointer hover:bg-gray-500 transition-all duration-300 ease-out"
-        >
-          <div className="h-6 w-6 overflow-hidden rounded-full mr-2">
-            {!profile?.profile?.image ? (
-              <UserCircleIcon className="h-6" />
-            ) : (
-              <img src={profile.profile.image} />
-            )}
+          onClick={() => {
+            setOpenUsers(false);
+          }}
+          className="h-full w-full"
+        ></div>
+        <div className="flex flex-col h-full border-l border-gray-500 bg-gray-700">
+          <h1 className="text-lg font-normal p-2">Account</h1>
+
+          <div
+            onClick={() => setOpenProfile(true)}
+            className="flex w-full text-center p-2 border-b border-gray-500 cursor-pointer hover:bg-gray-500 transition-all duration-300 ease-out"
+          >
+            <div className="h-6 w-6 overflow-hidden rounded-full mr-2">
+              {!profile?.profile?.image ? (
+                <UserCircleIcon className="h-6" />
+              ) : (
+                <img src={profile.profile.image} />
+              )}
+            </div>
+            <p>{profile?.profile?.name ? profile.profile.name : fromEmail}</p>
           </div>
-          <p>
-            {profile?.profile?.name
-              ? profile.profile.name
-              : session?.user?.email}
-          </p>
+          <h1 className="pt-5 px-2 pb-3 text-lg font-normal">Users</h1>
+          <>
+            <h1 className="text-green-500 p-2">Online</h1>
+            {users?.users.map(
+              (u) =>
+                u.email !== fromEmail &&
+                u.sessions.length > 0 && (
+                  <div
+                    className="cursor-pointer border-b border-gray-500 w-full hover:bg-gray-500 transition-all duration-300 ease-out"
+                    key={u.email}
+                  >
+                    <div
+                      className="p-2 flex"
+                      onClick={() => {
+                        if (!u) return;
+                        startConversation(u);
+                      }}
+                    >
+                      {u.image ? (
+                        <div className="h-6 w-6 overflow-hidden rounded-full">
+                          <img src={u.image} />
+                        </div>
+                      ) : (
+                        <UserCircleIcon className="h-6" />
+                      )}
+                      <p className="ml-2">{u.name ? u.name : u.email}</p>
+                    </div>
+                  </div>
+                )
+            )}
+          </>
+          <>
+            <h1 className="text-red-500 pt-5 px-2">Offline</h1>
+            {users?.users.map(
+              (u) =>
+                u.email !== fromEmail &&
+                u.sessions.length === 0 && (
+                  <div
+                    className="cursor-pointer border-b border-gray-500 w-full hover:bg-gray-500 transition-all duration-300 ease-out"
+                    key={u.email}
+                  >
+                    <div
+                      className="p-2 flex"
+                      onClick={() => {
+                        if (!u) return;
+                        startConversation(u);
+                      }}
+                    >
+                      {u.image ? (
+                        <img className="h-6 w-6 rounded-full" src={u.image} />
+                      ) : (
+                        <UserCircleIcon className="h-6" />
+                      )}
+                      <p className="ml-2">{u.name ? u.name : u.email}</p>
+                    </div>
+                  </div>
+                )
+            )}
+          </>
         </div>
-        <h1 className="pt-5 pb-3 text-lg font-normal">Users</h1>
-        <>
-          <h1 className="text-green-500">Online</h1>
-          {users?.users.map(
-            (u) =>
-              u.email !== session?.user?.email &&
-              u.sessions.length > 0 && (
-                <div
-                  className="cursor-pointer border-b border-gray-500 w-full hover:bg-gray-500 transition-all duration-300 ease-out"
-                  key={u.email}
-                >
-                  <div
-                    className="p-2 flex"
-                    onClick={() => {
-                      if (!u) return;
-                      startConversation(u);
-                    }}
-                  >
-                    {u.image ? (
-                      <div className="h-6 w-6 overflow-hidden rounded-full">
-                        <img src={u.image} />
-                      </div>
-                    ) : (
-                      <UserCircleIcon className="h-6" />
-                    )}
-                    <p className="ml-2">{u.name ? u.name : u.email}</p>
-                  </div>
-                </div>
-              )
-          )}
-        </>
-        <>
-          <h1 className="text-red-500 pt-5">Offline</h1>
-          {users?.users.map(
-            (u) =>
-              u.email !== session?.user?.email &&
-              u.sessions.length === 0 && (
-                <div
-                  className="cursor-pointer border-b border-gray-500 w-full"
-                  key={u.email}
-                >
-                  <div
-                    className="p-2 flex"
-                    onClick={() => {
-                      if (!u) return;
-                      startConversation(u);
-                    }}
-                  >
-                    {u.image ? (
-                      <div className="h-6 w-6 overflow-hidden rounded-full mr-2">
-                        <img src={u.image} />
-                      </div>
-                    ) : (
-                      <UserCircleIcon className="h-6" />
-                    )}
-                    {u.name ? u.name : u.email}
-                  </div>
-                </div>
-              )
-          )}
-        </>
       </div>
     </>
   );

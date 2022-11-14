@@ -55,23 +55,30 @@ model Conversation {
   recentMessage       String?
   recentSender        String?
   timeOfRecentMessage String?
-  read                Boolean?
   messages            Message[]
   users               User[]
 }
 
+model ReadConversation {
+  id        Int    @id @default(autoincrement())
+  userEmail String
+  convoId   Int
+  user      User   @relation(fields: [userEmail], references: [email])
+}
+
 model User {
-  id            String         @id @default(cuid())
-  name          String?
-  email         String?        @unique
-  emailVerified DateTime?
-  image         String?        @db.LongText
-  messagesSent  Int?
-  age           Int?
-  coins         Int?
-  conversations Conversation[]
-  accounts      Account[]
-  sessions      Session[]
+  id                String             @id @default(cuid())
+  name              String?
+  email             String?            @unique
+  emailVerified     DateTime?
+  image             String?            @db.LongText
+  messagesSent      Int?
+  age               Int?
+  coins             Int?
+  conversations     Conversation[]
+  readConversations ReadConversation[]
+  accounts          Account[]
+  sessions          Session[]
 }
 
 model VerificationToken {

@@ -1,14 +1,7 @@
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { Conversation, Message, Session, User } from "@prisma/client";
+import { Dispatch, SetStateAction, useState } from "react";
+import { Session } from "@prisma/client";
 import { trpc } from "../utils/trpc";
-import { XMarkIcon } from "@heroicons/react/24/outline";
-import {
-  QueryObserverResult,
-  RefetchOptions,
-  RefetchQueryFilters,
-} from "react-query";
-import { TRPCClientErrorLike } from "@trpc/client";
-
+import { UserCircleIcon, XMarkIcon } from "@heroicons/react/24/outline";
 interface ConversationsInterface {
   fromEmail: string;
   openMenu: boolean;
@@ -25,42 +18,6 @@ interface ConversationsInterface {
     >
   >;
   setOpenMenu: Dispatch<SetStateAction<boolean>>;
-  conversations:
-    | {
-        conversations: {
-          recentMessage: string | null;
-          recentSender: string | null;
-          timeOfRecentMessage: string | null;
-          read: boolean | null;
-          users: {
-            id: string;
-            email: string | null;
-            name: string | null;
-            sessions: Session[];
-          }[];
-          id: number;
-        }[];
-      }
-    | undefined;
-  refetchConversations: <TPageData>(
-    options?: (RefetchOptions & RefetchQueryFilters<TPageData>) | undefined
-  ) => Promise<
-    QueryObserverResult<
-      | {
-          conversations: {
-            recentMessage: string | null;
-            users: {}[];
-            id: number;
-          }[];
-        }
-      | undefined,
-      TRPCClientErrorLike<any>
-    >
-  >;
-  isLoading: boolean;
-  isSuccess: boolean;
-  setIsOpened: Dispatch<SetStateAction<boolean>>;
-  isOpened: boolean;
 }
 
 export default function Conversations({
@@ -69,15 +26,21 @@ export default function Conversations({
   setConversationId,
   setToUser,
   setOpenMenu,
-  conversations,
-  refetchConversations,
-  isLoading,
-  isSuccess,
-  setIsOpened,
-  isOpened,
 }: ConversationsInterface) {
   const [openDeleteConvo, setOpenDeleteConvo] = useState(false);
   const [convoId, setConvoId] = useState<number>();
+
+  const {
+    data: conversations,
+    isSuccess,
+    isLoading,
+    refetch: refetchConversations,
+  } = trpc.useQuery(["get-conversations", { fromEmail }], {
+    onError(err) {
+      console.log(err, "err");
+    },
+    refetchInterval: 3000,
+  });
 
   const mutation = trpc.useMutation(["remove-user"], {
     onSuccess() {
@@ -90,10 +53,6 @@ export default function Conversations({
     const user = fromEmail;
     mutation.mutate({ user, convoId });
   };
-
-  useEffect(() => {
-    refetchConversations();
-  }, [openMenu]);
 
   return (
     <>
@@ -124,59 +83,85 @@ export default function Conversations({
         </div>
       )}
       <div
-        className={`flex flex-col fixed left-0 top-10 z-10 items-center border-r border-gray-500 h-full bg-gray-700 max-w-[250px] ${
+        className={`fixed top-10 inset-0 flex justify-start z-10 items-center ${
           openMenu
             ? "opacity-100 transition duration-500 ease-out"
             : "opacity-0 -translate-x-full transition duration-500 ease-out"
         }`}
       >
-        <h1 className="p-2 text-lg font-normal">
-          {conversations?.conversations.length} Conversations
-        </h1>
-        {isLoading && !isSuccess && <div>Loading...</div>}
-        {isSuccess && (
-          <div className="flex flex-col w-full overflow-scroll">
-            {conversations?.conversations.map((c) => (
-              <div className="border-b border-gray-500" key={c.id}>
-                <div className="flex mx-2 mt-2 justify-between items-center">
-                  <XMarkIcon
-                    onClick={() => {
-                      setConvoId(c.id);
-                      setOpenDeleteConvo(true);
-                    }}
-                    height="15px"
-                    className="cursor-pointer rounded-full hover:bg-red-500"
-                  />
+        <div className="flex flex-col h-full border-r border-gray-500 bg-gray-700">
+          <h1 className="p-2 text-lg font-normal">
+            {conversations?.conversations.length} Conversations
+          </h1>
+          {isLoading && !isSuccess && <div>Loading...</div>}
+          {isSuccess && (
+            <div className="flex flex-col w-full overflow-scroll">
+              {conversations?.conversations.map((c) => (
+                <div className="border-b border-gray-500 p-2" key={c.id}>
+                  <div className="flex justify-between items-center">
+                    <XMarkIcon
+                      onClick={() => {
+                        setConvoId(c.id);
+                        setOpenDeleteConvo(true);
+                      }}
+                      height="15px"
+                      className="cursor-pointer rounded-full hover:bg-red-500"
+                    />
+                    <div className="flex items-center">
+                      <p className="text-sm">{c.timeOfRecentMessage}</p>
+                      {!c.read && c.recentSender !== fromEmail ? (
+                        <p className="h-3 w-3 rounded-full bg-green-500"></p>
+                      ) : null}
+                    </div>
+                  </div>
                   <div className="flex items-center">
-                    <p className="text-sm mr-2">{c.timeOfRecentMessage}</p>
-                    {!c.read && c.recentSender !== fromEmail ? (
-                      <p className="h-3 w-3 rounded-full bg-green-500"></p>
-                    ) : null}
+                    {c.users.map((u) =>
+                      u.email !== fromEmail ? (
+                        <div>
+                          {u.image ? (
+                            <div className="flex h-10 w-10 overflow-hidden rounded-full">
+                              <div className="">
+                                <img src={u.image} />
+                              </div>
+                            </div>
+                          ) : (
+                            <UserCircleIcon className="h-10" />
+                          )}
+                        </div>
+                      ) : null
+                    )}
+
+                    <div
+                      className="cursor-pointer p-2 hover:bg-gray-500 transition-all duration-300 ease-out"
+                      onClick={() => {
+                        setConversationId(c.id);
+                        setToUser(c.users.find((u) => u.email !== fromEmail));
+                        setOpenMenu(false);
+                      }}
+                    >
+                      <p>
+                        {c.users.find((u) => u.email !== fromEmail)
+                          ? c.users.find((u) => u.email !== fromEmail)?.email
+                          : `No Users Left`}
+                      </p>
+                      <p className="text-gray-400 line-clamp-2 text-ellipsis text-sm">
+                        {c.recentMessage
+                          ? c.recentMessage
+                          : "No messages yet..."}
+                      </p>
+                    </div>
                   </div>
                 </div>
-
-                <div
-                  className="cursor-pointer p-2 hover:bg-gray-500 transition-all duration-300 ease-out"
-                  onClick={() => {
-                    setConversationId(c.id);
-                    setIsOpened(true);
-                    setToUser(c.users.find((u) => u.email !== fromEmail));
-                    setOpenMenu(false);
-                  }}
-                >
-                  <p>
-                    {c.users.find((u) => u.email !== fromEmail)
-                      ? c.users.find((u) => u.email !== fromEmail)?.email
-                      : `No Users Left`}
-                  </p>
-                  <p className="text-gray-400 line-clamp-2 text-ellipsis text-sm">
-                    {c.recentMessage ? c.recentMessage : "No messages yet..."}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
+              ))}
+            </div>
+          )}
+        </div>
+        <div
+          onClick={() => {
+            setOpenMenu(false);
+          }}
+          className="h-full w-full"
+        ></div>
       </div>
     </>
   );

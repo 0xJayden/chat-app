@@ -13,6 +13,7 @@ import {
   XMarkIcon,
 } from "@heroicons/react/24/outline";
 import Compressor from "compressorjs";
+import Moment from "react-moment";
 interface UsersInterface {
   setToUser: Dispatch<
     SetStateAction<
@@ -319,7 +320,11 @@ export default function Users({
                     ? profile.profile.messagesSent
                     : 0}
                 </p>
-                <p>{profile?.profile?.age ? profile.profile.age : 0 + "s"}</p>
+                {profile?.profile ? (
+                  <Moment fromNow ago>
+                    {profile.profile.timeCreated}
+                  </Moment>
+                ) : null}
                 <p>{profile?.profile?.coins ? profile.profile.coins : 0}</p>
               </div>
             </div>

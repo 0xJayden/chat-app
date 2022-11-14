@@ -54,7 +54,7 @@ model Conversation {
   timeCreated         DateTime  @default(now())
   recentMessage       String?
   recentSender        String?
-  timeOfRecentMessage String?
+  timeOfRecentMessage DateTime?
   read                Boolean?
   messages            Message[]
   users               User[]
@@ -62,12 +62,12 @@ model Conversation {
 
 model User {
   id            String         @id @default(cuid())
+  timeCreated   DateTime       @default(now())
   name          String?
   email         String?        @unique
   emailVerified DateTime?
   image         String?        @db.LongText
   messagesSent  Int?
-  age           Int?
   coins         Int?
   conversations Conversation[]
   accounts      Account[]

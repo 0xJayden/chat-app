@@ -2,6 +2,7 @@ import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import { trpc } from "../utils/trpc";
 import { User, Conversation, Session, Message } from "@prisma/client";
 import { ArrowUpIcon, UserCircleIcon } from "@heroicons/react/24/outline";
+import Moment from "react-moment";
 
 interface ConversationWindowInterface {
   toUser:
@@ -70,7 +71,7 @@ export default function ConversationWindow({
   const sendMessage = async () => {
     if (!message || !fromEmail || !convoId || !profile) return;
 
-    const time = Date.now().toString();
+    const time = new Date();
 
     const totalMessagesSent = profile.profile?.messagesSent;
 

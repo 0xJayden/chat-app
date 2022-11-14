@@ -2,6 +2,7 @@ import { Dispatch, SetStateAction, useState } from "react";
 import { Session } from "@prisma/client";
 import { trpc } from "../utils/trpc";
 import { UserCircleIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import Moment from "react-moment";
 interface ConversationsInterface {
   fromEmail: string;
   openMenu: boolean;
@@ -109,7 +110,11 @@ export default function Conversations({
                       className="cursor-pointer rounded-full hover:bg-red-500"
                     />
                     <div className="flex items-center">
-                      <p className="text-sm">{c.timeOfRecentMessage}</p>
+                      <p className="text-sm">
+                        {c.timeOfRecentMessage ? (
+                          <Moment fromNow>{c.timeOfRecentMessage}</Moment>
+                        ) : null}
+                      </p>
                       {!c.read && c.recentSender !== fromEmail ? (
                         <p className="h-3 w-3 rounded-full bg-green-500"></p>
                       ) : null}

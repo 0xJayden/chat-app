@@ -47,7 +47,7 @@ export const appRouter = trpc
       fromEmail: z.string(),
       message: z.string(),
       convoId: z.number(),
-      time: z.string(),
+      time: z.date(),
       amount: z.number(),
       read: z.boolean(),
     }),
@@ -192,7 +192,7 @@ export const appRouter = trpc
           image: true,
           coins: true,
           messagesSent: true,
-          age: true,
+          timeCreated: true,
         },
       });
       return {

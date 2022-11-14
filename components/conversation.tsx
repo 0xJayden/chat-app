@@ -47,6 +47,7 @@ export default function ConversationWindow({
       if (data.conversation?.recentSender !== fromEmail) readMessage();
     },
     refetchInterval: 2000,
+    enabled: convoId > 0,
   });
   const { data: profile, refetch: refetchProfile } = trpc.useQuery([
     "get-profile",

@@ -6,12 +6,13 @@ import {
   useState,
 } from "react";
 import { trpc } from "../utils/trpc";
-import { Conversation, User, Session, Message } from "@prisma/client";
+import { Conversation, Session } from "@prisma/client";
 import {
   UserCircleIcon,
   UserIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
+import Compressor from "compressorjs";
 interface UsersInterface {
   setToUser: Dispatch<
     SetStateAction<
@@ -34,7 +35,6 @@ interface UsersInterface {
   setOpenHi: Dispatch<SetStateAction<boolean>>;
   setPopup: Dispatch<SetStateAction<boolean>>;
   setPopupCoins: Dispatch<SetStateAction<boolean>>;
-  // setIsOpen: Dispatch<SetStateAction<boolean>>;
 }
 
 export default function Users({
@@ -49,15 +49,16 @@ export default function Users({
   setOpenHi,
   setPopup,
   setPopupCoins,
-}: // setIsOpen,
-UsersInterface) {
+}: UsersInterface) {
   const [openProfile, setOpenProfile] = useState(false);
   const [name, setName] = useState("");
   const [pfp, setPfp] = useState<string>();
 
   const imageInputRef = useRef<HTMLInputElement>(null);
 
-  const { data: users } = trpc.useQuery(["get-users"]);
+  const { data: users } = trpc.useQuery(["get-users"], {
+    enabled: openUsers,
+  });
   const { data: profile, refetch: refetchProfile } = trpc.useQuery([
     "get-profile",
     { fromEmail },
@@ -69,6 +70,7 @@ UsersInterface) {
         console.log(err, "err");
       },
       refetchInterval: 3000,
+      enabled: openUsers,
     }
   );
 
@@ -95,21 +97,8 @@ UsersInterface) {
 
     if (!fromUserId) return;
 
-    const existingUserInConvo = conversations?.conversations.find(
-      (c: {
-        recentMessage: string | null;
-        recentSender: string | null;
-        timeOfRecentMessage: string | null;
-        read: boolean | null;
-        users: {
-          id: string;
-          email: string | null;
-          name: string | null;
-          image: string | null;
-          sessions: Session[];
-        }[];
-        id: number;
-      }) => c.users.find((u) => u.email === user.email)
+    const existingUserInConvo = conversations?.conversations.find((c) =>
+      c.users.find((u) => u.email === user.email)
     );
 
     if (
@@ -197,30 +186,38 @@ UsersInterface) {
 
     if (!["image/jpeg", "image/png"].includes(selectedImage.type)) return;
 
-    let fileReader = new FileReader();
+    const res = new Compressor(selectedImage, {
+      quality: 0.8,
+      width: 1000,
+      height: 1000,
+      resize: "cover",
+      success: (res) => {
+        let fileReader = new FileReader();
 
-    fileReader.readAsDataURL(selectedImage);
+        fileReader.readAsDataURL(res);
 
-    fileReader.addEventListener("load", async (e) => {
-      if (
-        e.target == null ||
-        e.target.result == null ||
-        typeof e.target.result !== "string"
-      )
-        return;
+        fileReader.addEventListener("load", async (e) => {
+          if (
+            e.target == null ||
+            e.target.result == null ||
+            typeof e.target.result !== "string"
+          )
+            return;
 
-      const image = e.target.result;
+          const image = e.target.result;
 
-      addPfp.mutate(
-        { fromEmail, image },
-        {
-          onSuccess: async () => {
-            await refetchProfile();
-          },
-        }
-      );
+          addPfp.mutate(
+            { fromEmail, image },
+            {
+              onSuccess: async () => {
+                await refetchProfile();
+              },
+            }
+          );
 
-      setPfp(e.target.result);
+          setPfp(e.target.result);
+        });
+      },
     });
   };
 

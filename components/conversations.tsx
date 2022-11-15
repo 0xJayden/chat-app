@@ -3,6 +3,7 @@ import { Session } from "@prisma/client";
 import { trpc } from "../utils/trpc";
 import { UserCircleIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import Moment from "react-moment";
+import moment from "moment";
 interface ConversationsInterface {
   fromEmail: string;
   openMenu: boolean;
@@ -99,73 +100,86 @@ export default function Conversations({
           {isLoading && !isSuccess && <div>Loading...</div>}
           {isSuccess && (
             <div className="flex flex-col w-full overflow-scroll">
-              {conversations?.conversations.map((c) => (
-                <div className="border-b border-gray-500 p-2" key={c.id}>
-                  <div className="flex justify-between items-center">
-                    <XMarkIcon
-                      onClick={() => {
-                        setConvoId(c.id);
-                        setOpenDeleteConvo(true);
-                      }}
-                      height="15px"
-                      className="cursor-pointer rounded-full hover:bg-red-500"
-                    />
-                    <div className="flex items-center">
-                      <div className="text-sm">
-                        {c.timeOfRecentMessage ? (
-                          <Moment fromNow>{c.timeOfRecentMessage}</Moment>
+              {conversations?.conversations
+                .sort(
+                  (
+                    { timeOfRecentMessage: previous },
+                    { timeOfRecentMessage: current }
+                  ) =>
+                    current && previous
+                      ? new Date(current).getTime() -
+                        new Date(previous).getTime()
+                      : 0
+                )
+                .map((c) => (
+                  <div className="border-b border-gray-500 p-2" key={c.id}>
+                    <div className="flex justify-between items-center">
+                      <XMarkIcon
+                        onClick={() => {
+                          setConvoId(c.id);
+                          setOpenDeleteConvo(true);
+                        }}
+                        height="15px"
+                        className="cursor-pointer rounded-full hover:bg-red-500"
+                      />
+                      <div className="flex items-center">
+                        <div className="text-sm mr-2">
+                          {c.timeOfRecentMessage ? (
+                            <Moment fromNow>{c.timeOfRecentMessage}</Moment>
+                          ) : null}
+                        </div>
+                        {!c.read && c.recentSender !== fromEmail ? (
+                          <div className="h-3 w-3 rounded-full bg-green-500"></div>
                         ) : null}
                       </div>
-                      {!c.read && c.recentSender !== fromEmail ? (
-                        <div className="h-3 w-3 rounded-full bg-green-500"></div>
-                      ) : null}
                     </div>
-                  </div>
-                  <div className="flex items-center">
-                    {c.users.map((u) =>
-                      u.email !== fromEmail ? (
-                        <div key={u.id}>
-                          {u.image ? (
-                            <div className="flex h-10 w-10 overflow-hidden rounded-full">
-                              <div className="">
-                                <img src={u.image} />
+                    <div className="flex items-center">
+                      {c.users.map((u) =>
+                        u.email !== fromEmail ? (
+                          <div key={u.id}>
+                            {u.image ? (
+                              <div className="flex h-10 w-10 overflow-hidden rounded-full">
+                                <div className="">
+                                  <img src={u.image} />
+                                </div>
                               </div>
-                            </div>
-                          ) : (
-                            <UserCircleIcon className="h-10" />
-                          )}
-                        </div>
-                      ) : null
-                    )}
+                            ) : (
+                              <UserCircleIcon className="h-10" />
+                            )}
+                          </div>
+                        ) : null
+                      )}
 
-                    <div
-                      className="cursor-pointer p-2 w-full hover:bg-gray-500 transition-all duration-300 ease-out"
-                      onClick={() => {
-                        setConversationId(c.id);
-                        setToUser(c.users.find((u) => u.email !== fromEmail));
-                        setOpenMenu(false);
-                      }}
-                    >
-                      <>
-                        {c.users.length > 1 ? (
-                          c.users.map((u) =>
-                            u.email !== fromEmail ? (
-                              <div key={u.id}>{u.name ? u.name : u.email}</div>
-                            ) : null
-                          )
-                        ) : (
-                          <p>No users left</p>
-                        )}
-                      </>
-                      <p className="text-gray-400 line-clamp-2 text-ellipsis text-sm">
-                        {c.recentMessage
-                          ? c.recentMessage
-                          : "No messages yet..."}
-                      </p>
+                      <div
+                        className="cursor-pointer p-2 w-full hover:bg-gray-500 transition-all duration-300 ease-out"
+                        onClick={() => {
+                          setConversationId(c.id);
+                          setToUser(c.users.find((u) => u.email !== fromEmail));
+                          setOpenMenu(false);
+                        }}
+                      >
+                        <>
+                          {c.users.length > 1 ? (
+                            c.users.map((u) =>
+                              u.email !== fromEmail ? (
+                                <div key={u.id}>
+                                  {u.name ? u.name : u.email}
+                                </div>
+                              ) : null
+                            )
+                          ) : (
+                            <p>No users left</p>
+                          )}
+                        </>
+                        <p className="text-gray-400 line-clamp-2 text-ellipsis text-sm">
+                          {c.recentMessage
+                            ? c.recentMessage
+                            : "No messages yet..."}
+                        </p>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))}
             </div>
           )}
         </div>

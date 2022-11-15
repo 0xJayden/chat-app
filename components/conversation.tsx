@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from "react";
 import { trpc } from "../utils/trpc";
 import { User, Conversation, Session, Message } from "@prisma/client";
 import { ArrowUpIcon, UserCircleIcon } from "@heroicons/react/24/outline";
-import Moment from "react-moment";
 
 interface ConversationWindowInterface {
   toUser:
@@ -58,13 +57,9 @@ export default function ConversationWindow({
   };
 
   const mutation = trpc.useMutation(["send-message"], {
-    onSuccess: () => {
-      query.refetch();
+    onSuccess: async () => {
+      await query.refetch();
       refetchProfile();
-      console.log(
-        query.data?.conversation?.read,
-        query.data?.conversation?.recentSender
-      );
     },
   });
 

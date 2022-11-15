@@ -29,17 +29,20 @@ export default function Chat() {
     | undefined
   >();
 
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
+
   const { data: profile } = trpc.useQuery(["get-profile", { fromEmail }]);
 
   useEffect(() => {
     if (session && session.user?.email) {
       setFromEmail(session.user.email);
     }
-    if (!session) {
-      router.push("/");
+    if (!session && status !== "loading") {
+      router.push("/auth/signIn");
     }
   }, [session]);
+
+  if (status === "loading") return "loading...";
 
   return (
     <Layout>

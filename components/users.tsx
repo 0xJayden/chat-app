@@ -226,26 +226,24 @@ export default function Users({
     <>
       {popup && (
         <div
-          className={`sticky space-y-2 flex flex-col justify-center items-center z-30 animate-popup`}
+          className={`absolute -bottom-10 right-0 left-0 space-y-2 flex flex-col justify-center items-center z-30 animate-popup`}
         >
-          {openHi && (
+          <div
+            className={`flex justify-center items-center z-30 animate-separate`}
+          >
             <div
-              className={`sticky flex justify-center items-center z-30 animate-separate`}
-            >
-              <div
-                className={`flex flex-col justify-between items-center w-[200px] h-[50px] bg-green-500 rounded p-5 text-center
+              className={`flex flex-col justify-between items-center w-[200px] bg-green-500 rounded p-1 text-center
           `}
-              >
-                <h1>Hi, {profile?.profile?.name}</h1>
-              </div>
+            >
+              <h1>Hi, {profile?.profile?.name}</h1>
             </div>
-          )}
+          </div>
           {popupCoins && (
             <div
-              className={`sticky flex justify-center items-center z-30 animate-separate`}
+              className={`flex justify-center items-center z-30 animate-separate`}
             >
               <div
-                className={`flex flex-col justify-between items-center w-[200px] h-[50px] bg-green-500 rounded p-5 text-center
+                className={`flex flex-col justify-between items-center w-[200px] bg-green-500 rounded p-1 text-center
           `}
               >
                 <h1>+100 coins {profile?.profile?.coins}</h1>

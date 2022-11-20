@@ -98,9 +98,10 @@ export default function Conversations({
             {conversations?.conversations.length} Conversations
           </h1>
           {isLoading && !isSuccess && <div>Loading...</div>}
-          {isSuccess && (
-            <div className="flex flex-col w-full overflow-scroll">
-              {conversations?.conversations
+          {
+            isSuccess &&
+              // <div className="flex flex-col overflow-scroll">
+              conversations?.conversations
                 .sort(
                   (
                     { timeOfRecentMessage: previous },
@@ -112,8 +113,8 @@ export default function Conversations({
                       : 0
                 )
                 .map((c) => (
-                  <div className="border-b border-gray-500 p-2" key={c.id}>
-                    <div className="flex justify-between items-center">
+                  <div className="border-b border-gray-500" key={c.id}>
+                    <div className="flex justify-between items-center px-2">
                       <XMarkIcon
                         onClick={() => {
                           setConvoId(c.id);
@@ -133,7 +134,7 @@ export default function Conversations({
                         ) : null}
                       </div>
                     </div>
-                    <div className="flex items-center">
+                    <div className="flex items-center p-2 hover:bg-gray-500 transition-all duration-300 ease-out">
                       {c.users.map((u) =>
                         u.email !== fromEmail ? (
                           <div key={u.id}>
@@ -151,7 +152,7 @@ export default function Conversations({
                       )}
 
                       <div
-                        className="cursor-pointer p-2 w-full hover:bg-gray-500 transition-all duration-300 ease-out"
+                        className="cursor-pointer p-2 w-full"
                         onClick={() => {
                           setConversationId(c.id);
                           setToUser(c.users.find((u) => u.email !== fromEmail));
@@ -179,9 +180,9 @@ export default function Conversations({
                       </div>
                     </div>
                   </div>
-                ))}
-            </div>
-          )}
+                ))
+            /* </div> */
+          }
         </div>
         <div
           onClick={() => {

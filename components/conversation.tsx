@@ -88,7 +88,7 @@ export default function ConversationWindow({
   useEffect(scrollToBottom, [currentConversation]);
 
   return (
-    <div className="flex flex-col pt-5 px-5 min-h-[550px] items-center justify-between relative">
+    <div className="flex bg-gradient-to-r from-gray-800 to-gray-600 flex-col pt-5 px-5 min-h-[550px] items-center justify-between relative">
       {toUser?.email && (
         <div className="text-white flex justify-center fixed top-10 bg-gray-700 p-2 w-full">
           {/* <div className="h-6 w-6 mr-2 overflow-hidden rounded-full">
@@ -105,7 +105,7 @@ export default function ConversationWindow({
       )}
       {query.isLoading && <div>Loading...</div>}
       {query.isSuccess && (
-        <div className="flex flex-col w-full space-y-2 mb-[85px] overflow-scroll">
+        <div className="flex flex-col w-full space-y-2 mb-[85px]">
           {currentConversation?.messages.map((m) => (
             <div key={m.id}>
               <div

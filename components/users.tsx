@@ -224,9 +224,9 @@ export default function Users({
 
   return (
     <>
-      {popup && (
+      {!popup && (
         <div
-          className={`absolute -bottom-10 right-0 left-0 space-y-2 flex flex-col justify-center items-center z-30 animate-popup`}
+          className={`absolute right-0 left-0 space-y-2 flex flex-col justify-center items-center z-30 animate-popup`}
         >
           <div
             className={`flex justify-center items-center z-30 animate-separate`}

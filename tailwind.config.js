@@ -9,8 +9,8 @@ module.exports = {
     extend: {
       keyframes: {
         popup: {
-          "0%": { opacity: "0%" },
-          "25%": { bottom: "50px", opacity: "100%" },
+          "0%": { opacity: "0%", bottom: "-10px" },
+          "25%": { bottom: "20px", opacity: "100%" },
           "50%": { opacity: "100%" },
           "100%": { bottom: "50px", opacity: "0%" },
         },

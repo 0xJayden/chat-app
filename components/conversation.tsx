@@ -88,10 +88,11 @@ export default function ConversationWindow({
   useEffect(scrollToBottom, [currentConversation]);
 
   return (
-    <div className="flex bg-gradient-to-r from-gray-800 to-gray-600 flex-col pt-5 px-5 min-h-[550px] items-center justify-between relative">
-      {toUser?.email && (
-        <div className="text-white flex justify-center fixed top-10 bg-gray-700 p-2 w-full">
-          {/* <div className="h-6 w-6 mr-2 overflow-hidden rounded-full">
+    <div className="sm:w-full">
+      <div className="flex bg-gradient-to-r from-gray-800 to-gray-600 flex-col min-h-[550px] items-center justify-between relative pt-20 sm:pt-5 sm:w-full sm:h-full">
+        {toUser?.email && (
+          <div className="text-white flex justify-center fixed sm:sticky sm:mb-5 top-10 bg-gray-700 p-2 w-full">
+            {/* <div className="h-6 w-6 mr-2 overflow-hidden rounded-full">
             {!toUser?.image ? (
               <p>
                 <UserCircleIcon className="h-6" />
@@ -100,67 +101,70 @@ export default function ConversationWindow({
               <img src={toUser.image} />
             )}
           </div> */}
-          {toUser?.name ? toUser.name : toUser?.email}
-        </div>
-      )}
-      {query.isLoading && <div>Loading...</div>}
-      {query.isSuccess && (
-        <div className="flex flex-col w-full space-y-2 mb-[85px]">
-          {currentConversation?.messages.map((m) => (
-            <div key={m.id}>
-              <div
-                className={`w-full flex ${
-                  m.from !== fromEmail ? "justify-start" : "justify-end"
-                }`}
-              >
+            Conversation with {toUser?.name ? toUser.name : toUser?.email}
+          </div>
+        )}
+        {query.isLoading && <div>Loading...</div>}
+        {query.isSuccess && (
+          <div className="flex flex-col w-full space-y-2 px-5">
+            {currentConversation?.messages.map((m) => (
+              <div key={m.id}>
                 <div
-                  className={`rounded px-5 py-2 max-w-[275px] ${
-                    m.from !== fromEmail ? "bg-gray-500" : "bg-red-700"
+                  className={`w-full flex ${
+                    m.from !== fromEmail ? "justify-start" : "justify-end"
                   }`}
                 >
-                  <p className="overflow-auto">{m.message}</p>
+                  <div
+                    className={`rounded px-5 py-2 max-w-[275px] ${
+                      m.from !== fromEmail ? "bg-gray-500" : "bg-red-700"
+                    }`}
+                  >
+                    <p className="overflow-auto">{m.message}</p>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
-          <div ref={messagesEndRef} />
-        </div>
-      )}
+            ))}
+            <div ref={messagesEndRef} />
+          </div>
+        )}
 
-      <form
-        className="fixed w-full flex bottom-0 p-2 bg-gradient-to-r from-gray-800 to-gray-600"
-        onSubmit={(e) => {
-          e.preventDefault();
-          sendMessage();
-        }}
-      >
-        <textarea
-          onKeyDown={(e) => {
-            if (e.shiftKey && e.key === "Enter") return;
-
-            if (e.key === "Enter") {
-              e.preventDefault();
-              sendMessage();
-            }
+        <form
+          className="w-full flex bottom-0 p-2 bg-gradient-to-r from-gray-800 to-gray-600 sticky"
+          onSubmit={(e) => {
+            e.preventDefault();
+            sendMessage();
           }}
-          id="desktop-message"
-          onChange={(e) => setMessage(e.target.value)}
-          value={message ? message : ""}
-          placeholder="Type here..."
-          className="hidden sm:inline px-2 mr-2 min-h-[50px] max-h-[100px] w-full bg-gray-500 outline-none rounded"
-        />
-        <textarea
-          id="message"
-          onChange={(e) => setMessage(e.target.value)}
-          value={message ? message : ""}
-          placeholder="Type here..."
-          className="sm:hidden px-2 mr-2 min-h-[50px] max-h-[100px] w-full bg-gray-500 outline-none rounded"
-        />
-        <button className="px-3 rounded-full bg-gray-200" type="submit">
-          <ArrowUpIcon className="text-gray-600" height="20px" />
-        </button>
-      </form>
-      {mutation.error && <p>Something went wrong! {mutation.error.message}</p>}
+        >
+          <textarea
+            onKeyDown={(e) => {
+              if (e.shiftKey && e.key === "Enter") return;
+
+              if (e.key === "Enter") {
+                e.preventDefault();
+                sendMessage();
+              }
+            }}
+            id="desktop-message"
+            onChange={(e) => setMessage(e.target.value)}
+            value={message ? message : ""}
+            placeholder="Type here..."
+            className="hidden sm:inline px-2 mr-2 min-h-[50px] max-h-[100px] w-full bg-gray-500 outline-none rounded"
+          />
+          <textarea
+            id="message"
+            onChange={(e) => setMessage(e.target.value)}
+            value={message ? message : ""}
+            placeholder="Type here..."
+            className="sm:hidden px-2 mr-2 min-h-[50px] max-h-[100px] w-full bg-gray-500 outline-none rounded"
+          />
+          <button className="px-3 rounded-full bg-gray-200" type="submit">
+            <ArrowUpIcon className="text-gray-600" height="20px" />
+          </button>
+        </form>
+        {mutation.error && (
+          <p>Something went wrong! {mutation.error.message}</p>
+        )}
+      </div>
     </div>
   );
 }

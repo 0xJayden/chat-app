@@ -30,12 +30,12 @@ interface UsersInterface {
   setOpenUsers: Dispatch<SetStateAction<boolean>>;
   setConversationId: Dispatch<SetStateAction<number>>;
   fromEmail: string;
-  openHi: boolean;
-  popupCoins: boolean;
-  popup: boolean;
-  setOpenHi: Dispatch<SetStateAction<boolean>>;
-  setPopup: Dispatch<SetStateAction<boolean>>;
-  setPopupCoins: Dispatch<SetStateAction<boolean>>;
+  setIds: Dispatch<SetStateAction<Array<number>>>;
+  setName: Dispatch<SetStateAction<string>>;
+  name: string;
+  profileLoaded: boolean;
+  setUsersLoaded: Dispatch<SetStateAction<boolean>>;
+  usersLoaded: boolean;
 }
 
 export default function Users({
@@ -44,26 +44,28 @@ export default function Users({
   setOpenUsers,
   setConversationId,
   fromEmail,
-  openHi,
-  popupCoins,
-  popup,
-  setOpenHi,
-  setPopup,
-  setPopupCoins,
+  setIds,
+  setName,
+  name,
+  profileLoaded,
+  setUsersLoaded,
+  usersLoaded,
 }: UsersInterface) {
   const [openProfile, setOpenProfile] = useState(false);
-  const [name, setName] = useState("");
   const [pfp, setPfp] = useState<string>();
 
   const imageInputRef = useRef<HTMLInputElement>(null);
 
   const { data: users } = trpc.useQuery(["get-users"], {
-    enabled: openUsers,
+    enabled: profileLoaded,
+    onSuccess: () => setUsersLoaded(true),
   });
+
   const { data: profile, refetch: refetchProfile } = trpc.useQuery([
     "get-profile",
     { fromEmail },
   ]);
+
   const { data: conversations } = trpc.useQuery(
     ["get-conversations", { fromEmail }],
     {
@@ -71,13 +73,13 @@ export default function Users({
         console.log(err, "err");
       },
       refetchInterval: 3000,
-      enabled: openUsers,
+      enabled: usersLoaded,
     }
   );
 
   const mutation = trpc.useMutation(["create-conversation"]);
   const setNameMutation = trpc.useMutation(["set-name"]);
-  const addCoins = trpc.useMutation(["add-to-coins"]);
+  // const addCoins = trpc.useMutation(["add-to-coins"]);
   const addPfp = trpc.useMutation(["add-pfp"]);
 
   const startConversation = (
@@ -135,49 +137,48 @@ export default function Users({
       {
         onSuccess: async () => {
           await refetchProfile();
-          setOpenHi(true);
-          setPopup(true);
-          setTimeout(() => setOpenHi(false), 3000);
-          setName("");
+          setIds((prevIds) => {
+            return [...prevIds, 1];
+          });
         },
       }
     );
 
-    if (!profile?.profile?.coins) {
-      const amount = 100;
+    // if (!profile?.profile?.coins) {
+    //   const amount = 100;
 
-      addCoins.mutate(
-        {
-          fromEmail,
-          amount,
-        },
-        {
-          onSuccess: async () => {
-            await refetchProfile();
-            setPopupCoins(true);
-            setTimeout(() => setPopupCoins(false), 3000);
-            setTimeout(() => setPopup(false), 3000);
-          },
-        }
-      );
-    } else {
-      const amount = profile.profile.coins + 100;
+    //   addCoins.mutate(
+    //     {
+    //       fromEmail,
+    //       amount,
+    //     },
+    //     {
+    //       onSuccess: async () => {
+    //         await refetchProfile();
+    //         setIds((prevIds) => {
+    //           return [...prevIds, 2];
+    //         });
+    //       },
+    //     }
+    //   );
+    // } else {
+    //   const amount = profile.profile.coins + 100;
 
-      addCoins.mutate(
-        {
-          fromEmail,
-          amount,
-        },
-        {
-          onSuccess: async () => {
-            await refetchProfile();
-            setPopupCoins(true);
-            setTimeout(() => setPopupCoins(false), 3000);
-            setTimeout(() => setPopup(false), 3000);
-          },
-        }
-      );
-    }
+    //   addCoins.mutate(
+    //     {
+    //       fromEmail,
+    //       amount,
+    //     },
+    //     {
+    //       onSuccess: async () => {
+    //         await refetchProfile();
+    //         setIds((prevIds) => {
+    //           return [...prevIds, 2];
+    //         });
+    //       },
+    //     }
+    //   );
+    // }
   };
 
   const setProfilePicture = (e: BaseSyntheticEvent) => {
@@ -224,34 +225,6 @@ export default function Users({
 
   return (
     <>
-      {!popup && (
-        <div
-          className={`absolute right-0 left-0 space-y-2 flex flex-col justify-center items-center z-30 animate-popup`}
-        >
-          <div
-            className={`flex justify-center items-center z-30 animate-separate`}
-          >
-            <div
-              className={`flex flex-col justify-between items-center w-[200px] bg-green-500 rounded p-1 text-center
-          `}
-            >
-              <h1>Hi, {profile?.profile?.name}</h1>
-            </div>
-          </div>
-          {popupCoins && (
-            <div
-              className={`flex justify-center items-center z-30 animate-separate`}
-            >
-              <div
-                className={`flex flex-col justify-between items-center w-[200px] bg-green-500 rounded p-1 text-center
-          `}
-              >
-                <h1>+100 coins {profile?.profile?.coins}</h1>
-              </div>
-            </div>
-          )}
-        </div>
-      )}
       {openProfile && (
         <div className="fixed flex inset-0 justify-center items-center z-20 backdrop-brightness-50 backdrop-blur-sm">
           <div className="flex flex-col space-y-3 text-center border border-gray-500 rounded w-[350px] p-2">
@@ -329,100 +302,102 @@ export default function Users({
           </div>
         </div>
       )}
-      <div
-        className={`fixed top-10 inset-0 flex justify-start z-10 items-center ${
-          openUsers
-            ? "opacity-100 transition duration-500 ease-out"
-            : "opacity-0 translate-x-full transition duration-500 ease-out"
-        }`}
-      >
+      <div className="sm:w-fit">
         <div
-          onClick={() => {
-            setOpenUsers(false);
-          }}
-          className="h-full w-full"
-        ></div>
-        <div className="flex flex-col h-full min-w-[250px] border-l border-gray-500 bg-gray-700">
-          <h1 className="text-lg font-normal p-2">Account</h1>
-
+          className={`fixed top-10 inset-0 flex justify-start z-10 items-center sm:translate-x-0 sm:opacity-100 sm:left-auto sm:sticky sm:top-0 sm:h-screen ${
+            openUsers
+              ? "opacity-100 transition duration-500 ease-out"
+              : "opacity-0 translate-x-full transition duration-500 ease-in"
+          }`}
+        >
           <div
-            onClick={() => setOpenProfile(true)}
-            className="flex w-full text-center p-2 border-b border-gray-500 cursor-pointer hover:bg-gray-500 transition-all duration-300 ease-out"
-          >
-            <div className="h-6 w-6 overflow-hidden rounded-full mr-2">
-              {!profile?.profile?.image ? (
-                <UserCircleIcon className="h-6" />
-              ) : (
-                <>
-                  {profile.profile.image.indexOf("https") === 0 ? (
-                    <img src={`${profile.profile.image}`} />
-                  ) : (
-                    <img src={profile.profile.image} />
-                  )}
-                </>
-              )}
+            onClick={() => {
+              setOpenUsers(false);
+            }}
+            className="h-full w-full sm:hidden"
+          ></div>
+          <div className="flex flex-col h-full min-w-[250px] border-l border-gray-500 bg-gray-700">
+            <h1 className="text-lg font-normal p-2">Account</h1>
+
+            <div
+              onClick={() => setOpenProfile(true)}
+              className="flex w-full text-center p-2 border-b border-gray-500 cursor-pointer hover:bg-gray-500 transition-all duration-300 ease-out"
+            >
+              <div className="h-6 w-6 overflow-hidden rounded-full mr-2">
+                {!profile?.profile?.image ? (
+                  <UserCircleIcon className="h-6" />
+                ) : (
+                  <>
+                    {profile.profile.image.indexOf("https") === 0 ? (
+                      <img src={`${profile.profile.image}`} />
+                    ) : (
+                      <img src={profile.profile.image} />
+                    )}
+                  </>
+                )}
+              </div>
+              <p>{profile?.profile?.name ? profile.profile.name : fromEmail}</p>
             </div>
-            <p>{profile?.profile?.name ? profile.profile.name : fromEmail}</p>
+            <h1 className="pt-5 px-2 pb-3 text-lg font-normal">Users</h1>
+            <>
+              <h1 className="text-green-500 p-2">Online</h1>
+              {users?.users.map(
+                (u) =>
+                  u.email !== fromEmail &&
+                  u.sessions.length > 0 && (
+                    <div
+                      className="cursor-pointer border-b border-gray-500 w-full hover:bg-gray-500 transition-all duration-300 ease-out"
+                      key={u.email}
+                    >
+                      <div
+                        className="p-2 flex"
+                        onClick={() => {
+                          if (!u) return;
+                          startConversation(u);
+                        }}
+                      >
+                        {u.image ? (
+                          <div className="h-6 w-6 overflow-hidden rounded-full">
+                            <img src={u.image} />
+                          </div>
+                        ) : (
+                          <UserCircleIcon className="h-6" />
+                        )}
+                        <p className="ml-2">{u.name ? u.name : u.email}</p>
+                      </div>
+                    </div>
+                  )
+              )}
+            </>
+            <>
+              <h1 className="text-red-500 pt-5 px-2">Offline</h1>
+              {users?.users.map(
+                (u) =>
+                  u.email !== fromEmail &&
+                  u.sessions.length === 0 && (
+                    <div
+                      className="cursor-pointer border-b border-gray-500 w-full hover:bg-gray-500 transition-all duration-300 ease-out"
+                      key={u.email}
+                    >
+                      <div
+                        className="p-2 flex"
+                        onClick={() => {
+                          if (!u) return;
+                          startConversation(u);
+                        }}
+                      >
+                        {u.image ? (
+                          <img className="h-6 w-6 rounded-full" src={u.image} />
+                        ) : (
+                          <UserCircleIcon className="h-6" />
+                        )}
+                        <p className="ml-2">{u.name ? u.name : u.email}</p>
+                      </div>
+                    </div>
+                  )
+              )}
+            </>
           </div>
-          <h1 className="pt-5 px-2 pb-3 text-lg font-normal">Users</h1>
-          <>
-            <h1 className="text-green-500 p-2">Online</h1>
-            {users?.users.map(
-              (u) =>
-                u.email !== fromEmail &&
-                u.sessions.length > 0 && (
-                  <div
-                    className="cursor-pointer border-b border-gray-500 w-full hover:bg-gray-500 transition-all duration-300 ease-out"
-                    key={u.email}
-                  >
-                    <div
-                      className="p-2 flex"
-                      onClick={() => {
-                        if (!u) return;
-                        startConversation(u);
-                      }}
-                    >
-                      {u.image ? (
-                        <div className="h-6 w-6 overflow-hidden rounded-full">
-                          <img src={u.image} />
-                        </div>
-                      ) : (
-                        <UserCircleIcon className="h-6" />
-                      )}
-                      <p className="ml-2">{u.name ? u.name : u.email}</p>
-                    </div>
-                  </div>
-                )
-            )}
-          </>
-          <>
-            <h1 className="text-red-500 pt-5 px-2">Offline</h1>
-            {users?.users.map(
-              (u) =>
-                u.email !== fromEmail &&
-                u.sessions.length === 0 && (
-                  <div
-                    className="cursor-pointer border-b border-gray-500 w-full hover:bg-gray-500 transition-all duration-300 ease-out"
-                    key={u.email}
-                  >
-                    <div
-                      className="p-2 flex"
-                      onClick={() => {
-                        if (!u) return;
-                        startConversation(u);
-                      }}
-                    >
-                      {u.image ? (
-                        <img className="h-6 w-6 rounded-full" src={u.image} />
-                      ) : (
-                        <UserCircleIcon className="h-6" />
-                      )}
-                      <p className="ml-2">{u.name ? u.name : u.email}</p>
-                    </div>
-                  </div>
-                )
-            )}
-          </>
         </div>
       </div>
     </>

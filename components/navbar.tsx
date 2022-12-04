@@ -18,13 +18,13 @@ export default function Navbar({
   const router = useRouter();
 
   return (
-    <div className="fixed z-10 justify-between items-center px-2 w-full h-10 flex bg-gray-700 top-0 border-b border-gray-500">
+    <div className="fixed z-10 justify-between sm:justify-center items-center px-2 w-full h-10 flex bg-gray-700 top-0 border-b border-gray-500">
       <Bars3Icon
         onClick={() => {
           setOpenMenu(!openMenu);
           setOpenUsers(false);
         }}
-        className="h-7 cursor-pointer"
+        className="h-7 cursor-pointer sm:hidden"
       />
       <button
         className="border px-2 rounded-full hover:bg-red-500 transition-all duration-300 ease-out"
@@ -37,7 +37,7 @@ export default function Navbar({
           setOpenUsers(!openUsers);
           setOpenMenu(false);
         }}
-        className="h-7 cursor-pointer"
+        className="h-7 cursor-pointer sm:hidden"
       />
     </div>
   );

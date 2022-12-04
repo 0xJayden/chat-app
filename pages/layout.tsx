@@ -4,7 +4,7 @@ interface Props {
 
 const Layout = ({ children }: Props) => {
   return (
-    <div className="bg-gradient-to-r from-gray-800 to-gray-600 text-gray-100 h-screen font-light">
+    <div className="bg-gradient-to-r from-gray-800 to-gray-600 text-gray-100 h-screen sm:h-full font-light">
       {children}
     </div>
   );

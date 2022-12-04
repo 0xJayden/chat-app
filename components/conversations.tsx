@@ -86,21 +86,20 @@ export default function Conversations({
           </div>
         </div>
       )}
-      <div
-        className={`fixed top-10 inset-0 flex justify-start z-10 items-center ${
-          openMenu
-            ? "opacity-100 transition duration-500 ease-out"
-            : "opacity-0 -translate-x-full transition duration-500 ease-out"
-        }`}
-      >
-        <div className="flex flex-col h-full min-w-[200px] border-r border-gray-500 bg-gray-700">
-          <h1 className="p-2 text-lg font-normal">
-            {conversations?.conversations.length} Conversations
-          </h1>
-          {isLoading && !isSuccess && <div>Loading...</div>}
-          {
-            isSuccess &&
-              // <div className="flex flex-col overflow-scroll">
+      <div className="sm:w-fit">
+        <div
+          className={`fixed top-10 inset-0 sm:left-0 sm:bottom-0 flex z-10 sm:translate-x-0 sm:opacity-100 sm:right-auto sm:sticky sm:top-0 sm:h-screen ${
+            openMenu
+              ? "opacity-100 transition duration-500 ease-out"
+              : "opacity-0 -translate-x-full transition duration-500 ease-in"
+          }`}
+        >
+          <div className="flex flex-col min-w-[200px] border-r border-gray-500 bg-gray-700 sm:sticky">
+            <h1 className="p-2 text-lg font-normal">
+              {conversations?.conversations.length} Conversations
+            </h1>
+            {isLoading && !isSuccess && <div>Loading...</div>}
+            {isSuccess &&
               conversations?.conversations
                 .sort(
                   (
@@ -180,16 +179,15 @@ export default function Conversations({
                       </div>
                     </div>
                   </div>
-                ))
-            /* </div> */
-          }
+                ))}
+          </div>
+          <div
+            onClick={() => {
+              setOpenMenu(false);
+            }}
+            className="h-full w-full sm:hidden"
+          ></div>
         </div>
-        <div
-          onClick={() => {
-            setOpenMenu(false);
-          }}
-          className="h-full w-full"
-        ></div>
       </div>
     </>
   );

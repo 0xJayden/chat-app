@@ -17,10 +17,10 @@ export default function Chat() {
   const [openMenu, setOpenMenu] = useState(false);
   const [openUsers, setOpenUsers] = useState(false);
   const [convoId, setConversationId] = useState<number>(0);
-  const [ids, setIds] = useState<Array<number>>([]);
   const [name, setName] = useState("");
   const [profileLoaded, setProfileLoaded] = useState(false);
   const [usersLoaded, setUsersLoaded] = useState(false);
+  const [ids, setIds] = useState<Array<number>>([]);
   const [toUser, setToUser] = useState<
     | {
         id: string;
@@ -37,20 +37,6 @@ export default function Chat() {
     onSuccess: () => setProfileLoaded(true),
   });
 
-  const triggerPopup = () => {
-    if (!ids) return;
-
-    return ids.map((i) => (
-      <div
-        data-popupid={i}
-        key={i}
-        className="bg-green-500 text-center px-2 py-1 rounded animate-popup relative transition-all duration-1000 ease-out"
-      >
-        {i === 1 && <p>{`Hi ${name}`}</p>}
-      </div>
-    ));
-  };
-
   useEffect(() => {
     if (session && session.user?.email) {
       setFromEmail(session.user.email);
@@ -60,28 +46,11 @@ export default function Chat() {
     }
   }, [session]);
 
-  useEffect(() => {
-    if (ids.length === 0) return;
-
-    const mostRecentId = ids[ids.length - 1];
-
-    const popupElement = document.querySelector(
-      `[data-popupid="${mostRecentId}"]`
-    );
-
-    if (!popupElement) return;
-
-    setTimeout(() => {
-      if (name) setName("");
-      setIds((prevIds) => prevIds.filter((id) => id !== mostRecentId));
-    }, 1900);
-  }, [ids]);
-
   if (status === "loading") return "loading...";
 
   return (
     <Layout>
-      <Popup triggerPopup={triggerPopup} />
+      <Popup name={name} setName={setName} ids={ids} setIds={setIds} />
       <Navbar
         setOpenMenu={setOpenMenu}
         openMenu={openMenu}

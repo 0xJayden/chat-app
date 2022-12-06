@@ -65,7 +65,7 @@ export default function Chat() {
           </h1>
         </div>
       )}
-      <div className="sm:flex sm:overflow-hidden">
+      <div className="sm:flex sm:overflow-hidden sm:justify-between">
         <Conversations
           fromEmail={fromEmail}
           openMenu={openMenu}

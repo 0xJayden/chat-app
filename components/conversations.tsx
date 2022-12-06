@@ -87,109 +87,106 @@ export default function Conversations({
           </div>
         </div>
       )}
-      <div className="sm:w-fit">
-        <div
-          className={`fixed top-10 inset-0 sm:left-0 sm:bottom-0 flex z-10 sm:translate-x-0 sm:opacity-100 sm:right-auto sm:sticky sm:top-0 sm:h-screen ${
-            openMenu
-              ? "opacity-100 transition duration-500 ease-out"
-              : "opacity-0 -translate-x-full transition duration-500 ease-in"
-          }`}
-        >
-          <div className="flex flex-col min-w-[200px] border-r border-gray-500 bg-gray-700 sm:sticky">
-            <h1 className="p-2 text-lg font-normal">
-              {conversations?.conversations.length} Conversations
-            </h1>
-            {isLoading && !isSuccess && <Loading />}
-            {isSuccess &&
-              conversations?.conversations
-                .sort(
-                  (
-                    { timeOfRecentMessage: previous },
-                    { timeOfRecentMessage: current }
-                  ) =>
-                    current && previous
-                      ? new Date(current).getTime() -
-                        new Date(previous).getTime()
-                      : 0
-                )
-                .map((c) => (
-                  <div className="border-b border-gray-500" key={c.id}>
-                    <div className="flex justify-between items-center px-2">
-                      <XMarkIcon
-                        onClick={() => {
-                          setConvoId(c.id);
-                          setOpenDeleteConvo(true);
-                        }}
-                        height="15px"
-                        className="cursor-pointer rounded-full hover:bg-red-500"
-                      />
-                      <div className="flex items-center">
-                        <div className="text-sm mr-2">
-                          {c.timeOfRecentMessage ? (
-                            <Moment fromNow>{c.timeOfRecentMessage}</Moment>
-                          ) : null}
-                        </div>
-                        {!c.read && c.recentSender !== fromEmail ? (
-                          <div className="h-3 w-3 rounded-full bg-green-500"></div>
+      {/* <div className=""> */}
+      <div
+        className={`fixed top-10 inset-0 flex z-10 sm:translate-x-0 sm:opacity-100 sm:right-auto sm:sticky sm:top-0 sm:h-screen ${
+          openMenu
+            ? "opacity-100 transition duration-500 ease-out"
+            : "opacity-0 -translate-x-full transition duration-500 ease-in"
+        }`}
+      >
+        <div className="flex flex-col min-w-[200px] border-r border-gray-500 bg-gray-700">
+          <h1 className="p-2 text-lg font-normal">
+            {conversations?.conversations.length} Conversations
+          </h1>
+          {isLoading && !isSuccess && <Loading />}
+          {isSuccess &&
+            conversations?.conversations
+              .sort(
+                (
+                  { timeOfRecentMessage: previous },
+                  { timeOfRecentMessage: current }
+                ) =>
+                  current && previous
+                    ? new Date(current).getTime() - new Date(previous).getTime()
+                    : 0
+              )
+              .map((c) => (
+                <div className="border-b border-gray-500" key={c.id}>
+                  <div className="flex justify-between items-center px-2">
+                    <XMarkIcon
+                      onClick={() => {
+                        setConvoId(c.id);
+                        setOpenDeleteConvo(true);
+                      }}
+                      height="15px"
+                      className="cursor-pointer rounded-full hover:bg-red-500"
+                    />
+                    <div className="flex items-center">
+                      <div className="text-sm mr-2">
+                        {c.timeOfRecentMessage ? (
+                          <Moment fromNow>{c.timeOfRecentMessage}</Moment>
                         ) : null}
                       </div>
-                    </div>
-                    <div className="flex items-center p-2 hover:bg-gray-500 transition-all duration-300 ease-out">
-                      {c.users.map((u) =>
-                        u.email !== fromEmail ? (
-                          <div key={u.id}>
-                            {u.image ? (
-                              <div className="flex h-10 w-10 overflow-hidden rounded-full">
-                                <div className="">
-                                  <img src={u.image} />
-                                </div>
-                              </div>
-                            ) : (
-                              <UserCircleIcon className="h-10" />
-                            )}
-                          </div>
-                        ) : null
-                      )}
-
-                      <div
-                        className="cursor-pointer p-2 w-full"
-                        onClick={() => {
-                          setConversationId(c.id);
-                          setToUser(c.users.find((u) => u.email !== fromEmail));
-                          setOpenMenu(false);
-                        }}
-                      >
-                        <>
-                          {c.users.length > 1 ? (
-                            c.users.map((u) =>
-                              u.email !== fromEmail ? (
-                                <div key={u.id}>
-                                  {u.name ? u.name : u.email}
-                                </div>
-                              ) : null
-                            )
-                          ) : (
-                            <p>No users left</p>
-                          )}
-                        </>
-                        <p className="text-gray-400 line-clamp-2 text-ellipsis text-sm">
-                          {c.recentMessage
-                            ? c.recentMessage
-                            : "No messages yet..."}
-                        </p>
-                      </div>
+                      {!c.read && c.recentSender !== fromEmail ? (
+                        <div className="h-3 w-3 rounded-full bg-green-500"></div>
+                      ) : null}
                     </div>
                   </div>
-                ))}
-          </div>
-          <div
-            onClick={() => {
-              setOpenMenu(false);
-            }}
-            className="h-full w-full sm:hidden"
-          ></div>
+                  <div className="flex items-center p-2 hover:bg-gray-500 transition-all duration-300 ease-out">
+                    {c.users.map((u) =>
+                      u.email !== fromEmail ? (
+                        <div key={u.id}>
+                          {u.image ? (
+                            <div className="flex h-10 w-10 overflow-hidden rounded-full">
+                              <div className="">
+                                <img src={u.image} />
+                              </div>
+                            </div>
+                          ) : (
+                            <UserCircleIcon className="h-10" />
+                          )}
+                        </div>
+                      ) : null
+                    )}
+
+                    <div
+                      className="cursor-pointer p-2 w-full"
+                      onClick={() => {
+                        setConversationId(c.id);
+                        setToUser(c.users.find((u) => u.email !== fromEmail));
+                        setOpenMenu(false);
+                      }}
+                    >
+                      <>
+                        {c.users.length > 1 ? (
+                          c.users.map((u) =>
+                            u.email !== fromEmail ? (
+                              <div key={u.id}>{u.name ? u.name : u.email}</div>
+                            ) : null
+                          )
+                        ) : (
+                          <p>No users left</p>
+                        )}
+                      </>
+                      <p className="text-gray-400 line-clamp-2 text-ellipsis text-sm">
+                        {c.recentMessage
+                          ? c.recentMessage
+                          : "No messages yet..."}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ))}
         </div>
+        <div
+          onClick={() => {
+            setOpenMenu(false);
+          }}
+          className="h-full w-full sm:hidden"
+        ></div>
       </div>
+      {/* </div> */}
     </>
   );
 }

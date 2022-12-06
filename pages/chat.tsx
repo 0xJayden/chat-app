@@ -59,13 +59,13 @@ export default function Chat() {
         openUsers={openUsers}
       />
       {convoId === 0 && (
-        <div className="w-full flex justify-center items-end pt-14">
+        <div className="w-full flex justify-center items-end pt-14 sm:absolute">
           <h1 className="text-white">
             Welcome {profile?.profile?.name ? profile.profile.name : fromEmail}!
           </h1>
         </div>
       )}
-      <div className="sm:flex sm:justify-between">
+      <div className="sm:flex sm:overflow-hidden">
         <Conversations
           fromEmail={fromEmail}
           openMenu={openMenu}

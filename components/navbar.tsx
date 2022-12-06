@@ -27,7 +27,7 @@ export default function Navbar({
         className="h-7 cursor-pointer sm:hidden"
       />
       <button
-        className="border px-2 rounded-full hover:bg-red-500 transition-all duration-300 ease-out"
+        className="border sm:mr-12 px-2 rounded-full hover:bg-red-500 transition-all duration-300 ease-out"
         onClick={() => router.push("/auth/signOut")}
       >
         Sign out

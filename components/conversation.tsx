@@ -91,7 +91,7 @@ export default function ConversationWindow({
     <div className="sm:w-full h-screen bg-gradient-to-r from-gray-800 to-gray-600 sm:overflow-scroll">
       <div className="flex flex-col min-h-[550px] h-full items-center justify-between relative pt-[90px] sm:pt-10 sm:w-full">
         {toUser?.email && (
-          <div className="text-white flex justify-center fixed sm:sticky sm:mb-5 top-10 bg-gray-700 p-2 w-full">
+          <div className="text-white flex justify-center fixed sm:mb-5 top-10 bg-gray-700 p-2 w-full">
             {/* <div className="h-6 w-6 mr-2 overflow-hidden rounded-full">
             {!toUser?.image ? (
               <p>
@@ -106,7 +106,7 @@ export default function ConversationWindow({
         )}
         {query.isLoading && <div>Loading...</div>}
         {query.isSuccess && (
-          <div className="flex flex-col w-full space-y-2 px-5 bg-gradient-to-r from-gray-800 to-gray-600">
+          <div className="flex flex-col w-full space-y-2 px-5 bg-gradient-to-r from-gray-800 to-gray-600 sm:pt-12">
             {currentConversation?.messages.map((m) => (
               <div key={m.id}>
                 <div

@@ -60,7 +60,7 @@ export default function Chat() {
       />
       {convoId === 0 && (
         <div className="w-full flex justify-center items-end pt-14 sm:absolute">
-          <h1 className="text-white">
+          <h1 className="text-white sm:mr-10">
             Welcome {profile?.profile?.name ? profile.profile.name : fromEmail}!
           </h1>
         </div>

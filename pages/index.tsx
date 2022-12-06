@@ -2,13 +2,14 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import Layout from "./layout";
 import { useSession } from "next-auth/react";
+import Loading from "../components/Loading";
 
 export default function Home() {
   const router = useRouter();
 
   const { data: session, status } = useSession();
 
-  if (status === "loading") return "loading...";
+  if (status === "loading") return <Loading />;
 
   if (session) {
     router.push("/chat");
@@ -18,6 +19,7 @@ export default function Home() {
 
   return (
     <Layout>
+      <Loading />
       <Head>
         <title>Chat App</title>
         <meta name="description" content="A cool chat app" />

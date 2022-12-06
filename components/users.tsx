@@ -14,6 +14,7 @@ import {
 } from "@heroicons/react/24/outline";
 import Compressor from "compressorjs";
 import Moment from "react-moment";
+import Loading from "./Loading";
 interface UsersInterface {
   setToUser: Dispatch<
     SetStateAction<
@@ -56,7 +57,11 @@ export default function Users({
 
   const imageInputRef = useRef<HTMLInputElement>(null);
 
-  const { data: users } = trpc.useQuery(["get-users"], {
+  const {
+    data: users,
+    isLoading,
+    isSuccess,
+  } = trpc.useQuery(["get-users"], {
     enabled: profileLoaded,
     onSuccess: () => setUsersLoaded(true),
   });
@@ -317,86 +322,95 @@ export default function Users({
             className="h-full w-full sm:hidden"
           ></div>
           <div className="flex flex-col h-full min-w-[250px] border-l border-gray-500 bg-gray-700">
-            <h1 className="text-lg font-normal p-2">Account</h1>
-
-            <div
-              onClick={() => setOpenProfile(true)}
-              className="flex w-full text-center p-2 border-b border-gray-500 cursor-pointer hover:bg-gray-500 transition-all duration-300 ease-out"
-            >
-              <div className="h-6 w-6 overflow-hidden rounded-full mr-2">
-                {!profile?.profile?.image ? (
-                  <UserCircleIcon className="h-6" />
-                ) : (
-                  <>
-                    {profile.profile.image.indexOf("https") === 0 ? (
-                      <img src={`${profile.profile.image}`} />
+            {isLoading && !isSuccess && <Loading />}
+            {isSuccess && (
+              <>
+                <h1 className="text-lg font-normal p-2">Account</h1>
+                <div
+                  onClick={() => setOpenProfile(true)}
+                  className="flex w-full text-center p-2 border-b border-gray-500 cursor-pointer hover:bg-gray-500 transition-all duration-300 ease-out"
+                >
+                  <div className="h-6 w-6 overflow-hidden rounded-full mr-2">
+                    {!profile?.profile?.image ? (
+                      <UserCircleIcon className="h-6" />
                     ) : (
-                      <img src={profile.profile.image} />
+                      <>
+                        {profile.profile.image.indexOf("https") === 0 ? (
+                          <img src={`${profile.profile.image}`} />
+                        ) : (
+                          <img src={profile.profile.image} />
+                        )}
+                      </>
                     )}
-                  </>
-                )}
-              </div>
-              <p>{profile?.profile?.name ? profile.profile.name : fromEmail}</p>
-            </div>
-            <h1 className="pt-5 px-2 pb-3 text-lg font-normal">Users</h1>
-            <>
-              <h1 className="text-green-500 p-2">Online</h1>
-              {users?.users.map(
-                (u) =>
-                  u.email !== fromEmail &&
-                  u.sessions.length > 0 && (
-                    <div
-                      className="cursor-pointer border-b border-gray-500 w-full hover:bg-gray-500 transition-all duration-300 ease-out"
-                      key={u.email}
-                    >
-                      <div
-                        className="p-2 flex"
-                        onClick={() => {
-                          if (!u) return;
-                          startConversation(u);
-                        }}
-                      >
-                        {u.image ? (
-                          <div className="h-6 w-6 overflow-hidden rounded-full">
-                            <img src={u.image} />
+                  </div>
+                  <p>
+                    {profile?.profile?.name ? profile.profile.name : fromEmail}
+                  </p>
+                </div>
+                <h1 className="pt-5 px-2 pb-3 text-lg font-normal">Users</h1>
+                <>
+                  <h1 className="text-green-500 p-2">Online</h1>
+                  {users?.users.map(
+                    (u) =>
+                      u.email !== fromEmail &&
+                      u.sessions.length > 0 && (
+                        <div
+                          className="cursor-pointer border-b border-gray-500 w-full hover:bg-gray-500 transition-all duration-300 ease-out"
+                          key={u.email}
+                        >
+                          <div
+                            className="p-2 flex"
+                            onClick={() => {
+                              if (!u) return;
+                              startConversation(u);
+                            }}
+                          >
+                            {u.image ? (
+                              <div className="h-6 w-6 overflow-hidden rounded-full">
+                                <img src={u.image} />
+                              </div>
+                            ) : (
+                              <UserCircleIcon className="h-6" />
+                            )}
+                            <p className="ml-2">{u.name ? u.name : u.email}</p>
                           </div>
-                        ) : (
-                          <UserCircleIcon className="h-6" />
-                        )}
-                        <p className="ml-2">{u.name ? u.name : u.email}</p>
-                      </div>
-                    </div>
-                  )
-              )}
-            </>
-            <>
-              <h1 className="text-red-500 pt-5 px-2">Offline</h1>
-              {users?.users.map(
-                (u) =>
-                  u.email !== fromEmail &&
-                  u.sessions.length === 0 && (
-                    <div
-                      className="cursor-pointer border-b border-gray-500 w-full hover:bg-gray-500 transition-all duration-300 ease-out"
-                      key={u.email}
-                    >
-                      <div
-                        className="p-2 flex"
-                        onClick={() => {
-                          if (!u) return;
-                          startConversation(u);
-                        }}
-                      >
-                        {u.image ? (
-                          <img className="h-6 w-6 rounded-full" src={u.image} />
-                        ) : (
-                          <UserCircleIcon className="h-6" />
-                        )}
-                        <p className="ml-2">{u.name ? u.name : u.email}</p>
-                      </div>
-                    </div>
-                  )
-              )}
-            </>
+                        </div>
+                      )
+                  )}
+                </>
+                <>
+                  <h1 className="text-red-500 pt-5 px-2">Offline</h1>
+                  {users?.users.map(
+                    (u) =>
+                      u.email !== fromEmail &&
+                      u.sessions.length === 0 && (
+                        <div
+                          className="cursor-pointer border-b border-gray-500 w-full hover:bg-gray-500 transition-all duration-300 ease-out"
+                          key={u.email}
+                        >
+                          <div
+                            className="p-2 flex"
+                            onClick={() => {
+                              if (!u) return;
+                              startConversation(u);
+                            }}
+                          >
+                            {u.image ? (
+                              <img
+                                className="h-6 w-6 rounded-full"
+                                src={u.image}
+                              />
+                            ) : (
+                              <UserCircleIcon className="h-6" />
+                            )}
+                            <p className="ml-2">{u.name ? u.name : u.email}</p>
+                          </div>
+                        </div>
+                      )
+                  )}
+                </>
+              </>
+            )}
           </div>
         </div>
       </div>

@@ -9,7 +9,6 @@ import {
 } from "next-auth/react";
 import { useRouter } from "next/router";
 import { BaseSyntheticEvent, useRef } from "react";
-import Layout from "../layout";
 
 export default function SignIn({
   providers,

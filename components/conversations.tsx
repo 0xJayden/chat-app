@@ -4,6 +4,7 @@ import { trpc } from "../utils/trpc";
 import { UserCircleIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import Moment from "react-moment";
 import moment from "moment";
+import Loading from "./Loading";
 interface ConversationsInterface {
   fromEmail: string;
   openMenu: boolean;
@@ -98,7 +99,7 @@ export default function Conversations({
             <h1 className="p-2 text-lg font-normal">
               {conversations?.conversations.length} Conversations
             </h1>
-            {isLoading && !isSuccess && <div>Loading...</div>}
+            {isLoading && !isSuccess && <Loading />}
             {isSuccess &&
               conversations?.conversations
                 .sort(

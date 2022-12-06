@@ -9,6 +9,7 @@ import { trpc } from "../utils/trpc";
 import { Session } from "@prisma/client";
 import { useRouter } from "next/router";
 import Navbar from "../components/navbar";
+import Loading from "../components/Loading";
 
 export default function Chat() {
   const router = useRouter();
@@ -46,7 +47,7 @@ export default function Chat() {
     }
   }, [session]);
 
-  if (status === "loading") return "loading...";
+  if (status === "loading") return <Loading />;
 
   return (
     <Layout>
